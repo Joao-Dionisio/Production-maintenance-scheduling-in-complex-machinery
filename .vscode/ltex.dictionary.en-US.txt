@@ -1,0 +1,10 @@
+optimality
+duals
+TbM
+CbM
+nonlinearities
+subproblems
+Dionísio
+Pedroso
+infeasibilities
+satisfiable

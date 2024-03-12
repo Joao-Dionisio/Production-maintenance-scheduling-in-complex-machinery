@@ -1,0 +1,98 @@
+\begin{thebibliography}{10}
+
+\bibitem{cigre445}
+{\em Guide for Transformer Maintenance}.
+\newblock \textit{CIGR\'{E}}, Paris, 2011.
+
+\bibitem{Artificial_Intelligence_Application_for_Just_in_Time_Maintenance}
+{\em {Artificial Intelligence Application for Just in Time Maintenance}}, volume Day 1 Mon, November 09, 2020 of {\em Abu Dhabi International Petroleum Exhibition and Conference}, 11 2020.
+\newblock D011S018R004.
+\newblock \href {https://arxiv.org/abs/https://onepetro.org/SPEADIP/proceedings-pdf/20ADIP/1-20ADIP/D011S018R004/2378389/spe-202869-ms.pdf} {\path{arXiv:https://onepetro.org/SPEADIP/proceedings-pdf/20ADIP/1-20ADIP/D011S018R004/2378389/spe-202869-ms.pdf}}, \href {https://doi.org/10.2118/202869-MS} {\path{doi:10.2118/202869-MS}}.
+
+\bibitem{scip8.0}
+Ksenia Bestuzheva, Mathieu Besan{\c{c}}on, Wei-Kun Chen, Antonia Chmiela, Tim Donkiewicz, Jasper van Doornmalen, Leon Eifler, Oliver Gaul, Gerald Gamrath, Ambros Gleixner, Leona Gottwald, Christoph Graczyk, Katrin Halbig, Alexander Hoen, Christopher Hojny, Rolf van~der Hulst, Thorsten Koch, Marco L{\"u}bbecke, Stephen~J. Maher, Frederic Matter, Erik M{\"u}hmer, Benjamin M{\"u}ller, Marc~E. Pfetsch, Daniel Rehfeldt, Steffan Schlein, Franziska Schl{\"o}sser, Felipe Serrano, Yuji Shinano, Boro Sofranac, Mark Turner, Stefan Vigerske, Fabian Wegscheider, Philipp Wellner, Dieter Weninger, and Jakob Witzig.
+\newblock {The SCIP Optimization Suite 8.0}.
+\newblock Technical report, Optimization Online, December 2021.
+\newblock URL: \url{http://www.optimization-online.org/DB_HTML/2021/12/8728.html}.
+
+\bibitem{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling}
+Thomas Bittar, Pierre Carpentier, Jean-Philippe Chancelier, and J{\'e}r{\^o}me Lonchampt.
+\newblock A decomposition method by interaction prediction for the optimization of maintenance scheduling.
+\newblock {\em Annals of Operations Research}, 316(1):229--267, Sep 2022.
+\newblock \href {https://doi.org/10.1007/s10479-021-04460-y} {\path{doi:10.1007/s10479-021-04460-y}}.
+
+\bibitem{Decomposition_Principle_for_Linear_Programs}
+George~B. Dantzig and Philip Wolfe.
+\newblock Decomposition principle for linear programs.
+\newblock {\em Operations Research}, 8(1):101--111, 1960.
+\newblock \href {https://arxiv.org/abs/https://doi.org/10.1287/opre.8.1.101} {\path{arXiv:https://doi.org/10.1287/opre.8.1.101}}, \href {https://doi.org/10.1287/opre.8.1.101} {\path{doi:10.1287/opre.8.1.101}}.
+
+\bibitem{An_Optimization_Model_for_Power_Transformer_Maintenance}
+Jo{\~a}o Dion{\'i}sio and Jo{\~a}o~Pedro Pedroso.
+\newblock An optimization model for power transformer maintenance.
+\newblock In Jo{\~a}o~Paulo Almeida, Filipe Pereira~e. Alvelos, Jorge~Orestes Cerdeira, Samuel Moniz, and Cristina Requejo, editors, {\em Operational Research}, pages 63--74, Cham, 2023. Springer Nature Switzerland.
+
+\bibitem{Theorie_der_einfachen_Ungleichungen}
+Julius Farkas.
+\newblock Theorie der einfachen ungleichungen.
+\newblock {\em Journal für die reine und angewandte Mathematik (Crelles Journal)}, 1902(124):1--27, 1902.
+\newblock URL: \url{https://doi.org/10.1515/crll.1902.124.1} [cited 2024-01-24], \href {https://doi.org/doi:10.1515/crll.1902.124.1} {\path{doi:doi:10.1515/crll.1902.124.1}}.
+
+\bibitem{Generic_Branch-Cut-and-Price}
+Gerald Gamrath.
+\newblock {\em Generic Branch-Cut-and-Price}.
+\newblock PhD thesis, 03 2010.
+
+\bibitem{Production_maintenance_and_resource_scheduling_A_review}
+M.~Geurtsen, Jeroen~B.H.C. Didden, J.~Adan, Z.~Atan, and I.~Adan.
+\newblock Production, maintenance and resource scheduling: A review.
+\newblock {\em European Journal of Operational Research}, 305(2):501--529, 2023.
+\newblock URL: \url{https://www.sciencedirect.com/science/article/pii/S0377221722002673}, \href {https://doi.org/10.1016/j.ejor.2022.03.045} {\path{doi:10.1016/j.ejor.2022.03.045}}.
+
+\bibitem{Exact_Methods_for_Recursive_Circle_Packing}
+Ambros Gleixner, Stephen~J. Maher, Benjamin Müller, and João~Pedro Pedroso.
+\newblock Price-and-verify: a new algorithm for recursive circle packing using dantzig–wolfe decomposition.
+\newblock {\em Annals of Operations Research}, 284(2):527–555, December 2018.
+\newblock URL: \url{http://dx.doi.org/10.1007/s10479-018-3115-5}, \href {https://doi.org/10.1007/s10479-018-3115-5} {\path{doi:10.1007/s10479-018-3115-5}}.
+
+\bibitem{Scheduling_jobs_with_time_resource_tradeoff_via_nonlinear_programming}
+Alexander Grigoriev and Marc Uetz.
+\newblock Scheduling jobs with time-resource tradeoff via nonlinear programming.
+\newblock {\em Discrete Optimization}, 6(4):414--419, 2009.
+\newblock URL: \url{https://www.sciencedirect.com/science/article/pii/S1572528609000334}, \href {https://doi.org/10.1016/j.disopt.2009.05.002} {\path{doi:10.1016/j.disopt.2009.05.002}}.
+
+\bibitem{matplotlib}
+J.~D. Hunter.
+\newblock Matplotlib: A 2d graphics environment.
+\newblock {\em Computing in Science \& Engineering}, 9(3):90--95, 2007.
+\newblock \href {https://doi.org/10.1109/MCSE.2007.55} {\path{doi:10.1109/MCSE.2007.55}}.
+
+\bibitem{github-repo}
+Joao-Dionisio.
+\newblock Production-maintenance-scheduling-in-complex-machinery.
+\newblock \url{https://github.com/Joao-Dionisio/Production-maintenance-scheduling-in-complex-machinery}, 2024.
+
+\bibitem{PySCIPOPT}
+Stephen Maher, Matthias Miltenberger, Jo{\~{a}}o~Pedro Pedroso, Daniel Rehfeldt, Robert Schwarz, and Felipe Serrano.
+\newblock {PySCIPOpt}: Mathematical programming in python with the {SCIP} optimization suite.
+\newblock In {\em Mathematical Software {\textendash} {ICMS} 2016}, pages 301--307. Springer International Publishing, 2016.
+\newblock \href {https://doi.org/10.1007/978-3-319-42432-3_37} {\path{doi:10.1007/978-3-319-42432-3_37}}.
+
+\bibitem{Assessing_the_Effectiveness_of_(Parallel)_Branch-and-bound_Algorithms}
+Stephen~J. Maher, Ted~K. Ralphs, and Yuji Shinano.
+\newblock Assessing the effectiveness of (parallel) branch-and-bound algorithms.
+\newblock {\em CoRR}, abs/2104.10025, 2021.
+\newblock URL: \url{https://arxiv.org/abs/2104.10025}, \href {https://arxiv.org/abs/2104.10025} {\path{arXiv:2104.10025}}.
+
+\bibitem{Simultaneous_column-and-row_generation}
+{\.{I}}brahim Muter, {\c{S}}.~{\.{I}}lker Birbil, and Kerem B{\"u}lb{\"u}l.
+\newblock Simultaneous column-and-row generation for large-scale linear programs with column-dependent-rows.
+\newblock {\em Mathematical Programming}, 142(1):47--82, Dec 2013.
+\newblock \href {https://doi.org/10.1007/s10107-012-0561-8} {\path{doi:10.1007/s10107-012-0561-8}}.
+
+\bibitem{Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}
+Zhicheng Zhu, Yisha Xiang, and Bo~Zeng.
+\newblock Multi-component maintenance optimization: A stochastic programming approach, 2019.
+\newblock \href {https://arxiv.org/abs/1907.00902} {\path{arXiv:1907.00902}}.
+
+\end{thebibliography}

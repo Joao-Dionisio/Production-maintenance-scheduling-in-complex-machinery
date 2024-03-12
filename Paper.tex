@@ -1,0 +1,585 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
+
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\makeatletter
+%\newcommand\notsotiny{\@setfontsize\notsotiny\@vipt\@viipt}
+\newcommand\notsotiny{\@setfontsize\notsotiny{5}{6}}
+\makeatother
+
+\let\oldnl\nl% Store \nl in \oldnl
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}% Remove line number for one line
+
+\usepackage[hyphens,spaces,obeyspaces]{url}
+
+%\theoremstyle{definition}
+%\newtheorem{exmp}{Example}[section]
+
+\newcommand{\cmss}[1]{\textrm{{\fontfamily{cmss}\selectfont  #1}}}
+
+
+\usepackage{optidef}
+\usepackage[ruled,linesnumbered,noend]{algorithm2e}
+\SetKwRepeat{Do}{do}{while}
+\usepackage{moreverb}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts, amssymb}
+%\usepackage[fleqn]{amsmath} %left align
+%\usepackage{amsthm}
+%\usepackage{amssymb}
+
+\usepackage{wrapfig} %wrapping text around image
+\usepackage{xcolor} % Used for changing text color. 
+\usepackage{float} % for forcing float placement
+\usepackage[font=small,labelfont=bf,justification=centering]{caption} % smaller captions
+
+
+%\usepackage{geometry} % to change margins
+%\newgeometry{vmargin={3cm}, hmargin={30mm,30mm}}
+
+%\usepackage[nodisplayskipstretch]{setspace}
+%\setstretch{0.0}
+
+%\usepackage[fleqn]{amsmath} %left align
+
+%todo note
+\usepackage{ulem}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommand{\jpp}[1]{{\color{teal}#1}}
+\newcommand{\jppC}[1]{\todo[backgroundcolor=teal!25,bordercolor=teal]{#1}}
+\normalem % removing underscore in loops and ifs
+% \newcommand{\qmax}{{\textsf{q$^\textsf{max}$}}}
+
+\begin{document}
+%
+\title{Production-maintenance scheduling in complex machinery}
+%\title{Long-term production-maintenance scheduling on parallel machines with interacting components: A Power Transformer Case Study}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+%\author{João Dionísio\inst{1,2} \and João Pedro Pedroso\inst{1,3}}
+%
+%\authorrunning{Dionísio et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+%\institute{1 - Faculdade de Ciências, Universidade do Porto, rua do Campo Alegre s/n, 4169–007 Porto, Portugal\\ 2 - INESC TEC 3 - CMUP}
+%
+%
+
+\author{João Dionísio\inst{1,2} \and Ambros M. Gleixner\inst{3,4} \and João Pedro Pedroso\inst{1,2} \and Ksenia Bestuzheva\inst{3}}
+%
+\authorrunning{Dionísio \and Gleixner \and Pedroso \and Bestuzheva} % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+%\tocauthor{Ivar Ekeland, Roger Temam, Jeffrey Dean, David Grove,
+%Craig Chambers, Kim B. Bruce, and Elisa Bertino}
+%
+\institute{Faculdade de Ciências, Universidade do Porto, rua do Campo Alegre s/n, $4169–007$ Porto, Portugal\\
+%\email{joao.goncalves.dionisio@gmail.com}\\
+\and CMUP, Centro de Matemática da Universidade do Porto
+\and Zuse Institute Berlin, Takustr. $7$, $14195$ Berlin, Germany
+\and Hochschule für Technik und Wirtschaft Berlin, Germany
+}
+
+\maketitle              % typeset the header of the contribution
+
+
+\begin{abstract}
+Long-term maintenance of machines with costly components has been studied throughout the years. However, research on combining long-term maintenance decisions with short-term production scheduling to satisfy a predetermined demand is less prevalent, especially that which study complex machinery with multiple interacting components. Our work contributes to this subject by studying an abstract mixed-integer nonlinear programming model, where an increase in production leads to faster degradation of components and thus creates the need for more maintenance. We will study a Dantzig-Wolfe decomposition to solve this difficult problem, with heuristics to speed up the pricing problem.
+
+\keywords{Production-maintenance scheduling \and Dantzig-Wolfe decomposition \and MINLP \and Resource allocation}
+\end{abstract}
+%
+%
+%
+\label{sec:intro}
+\section{Introduction}
+
+In this article, we present a MINLP with the objective of minimizing the maintenance cost of machines composed of multiple components, that must satisfy a predetermined continuous demand of a product. We also present a Dantzig-Wolfe reformulation. Additionally, we develop heuristics to aid in the solving of these difficult models.
+
+\subsubsection{Production-maintenance scheduling} ?????? EXPAND ON THE BACKGROUND ????? This problem belongs to the class of production-maintenance scheduling problems with parallel machines - see Geurtsen et al.~\cite{Production_maintenance_and_resource_scheduling_A_review} for a comprehensive literature review. Many variants of this problem exist and have been studied for decades, albeit less than other more classical problems. While some authors opt to model machine failure with a random distribution~\cite{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling, Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}, the majority of the literature looks at linear variants of this problem (see~\cite{Scheduling_jobs_with_time_resource_tradeoff_via_nonlinear_programming} for a resource-production exception), mostly because physical considerations tend to be ignored in more abstract models. 
+
+Recently, approaches using decomposition for maintenance scheduling have appeared in the literature. While some use Bender's decomposition for .... (see cite cite), others use Dantzig-Wolfe decomposition, in a manner similar to ours. Insert name of guy here explored the possibility of using blablabla in his PhD thesis cite.
+
+Our work differs from the ones we could find, since we are not assuming that our parallel machines are inseparable units, but rather consider them structures composed of interacting components, which can be independently maintained. Furthermore, even working with abstract machines, we admit the possibility of nonlinearities in the degradation of the components, which brings the models closer to reality, and increases their difficulty, as they are mixed-integer nonlinear programs.
+
+
+ \subsubsection{Maintenance in practice}
+  
+    Industrial maintenance tends to rely on two heuristics for maintenance scheduling: Time-based Maintenance (TbM), where maintenance is planned considering the time since the last maintenance action, and Condition Based Maintenance (CbM), where the asset is regularly tested and when some predefined threshold is reached, maintenance is scheduled (\hspace{1sp}\cite{cigre445} elaborates on this in the context of power transformers). 
+    
+    Research on methods for employing just-in-time maintenance is plentiful, with many of these methods resorting to machine learning, with the use of real-world data~\cite{Artificial_Intelligence_Application_for_Just_in_Time_Maintenance}. The idea is to perform maintenance at the precise point in time when any delay in the maintenance action would result in the failure of a component. As will be shown in Example~\ref{ex:non_optimal_JIT_maintenance}, this can lead to suboptimal solutions.
+
+    To make things worse, these strategies are employed independently of the production decisions, thus further straying away from optimality, which highlights the importance of better maintenance practices. \\
+
+
+  In terms of applications, this model can be used for minimizing maintenance costs of power transformer fleets, where the ``product'' is electricity, or in water treatment stations, where the ``product'' is clean water. More abstractly, it can also be understood as production-maintenance scheduling in factories working in parallel with different interacting machines. \\
+
+  This article is organized as follows: Section~\ref{sec:intro} frames the problem and provides a light background on production-maintenance problems and on maintenance practices, besides presenting the related work. In Section~\ref{sec:model}, the compact formulation is presented. Section~\ref{sec:DW} shows the Dantzig-Wolfe reformulation of this compact model, alongside implementation details. Due to the difficulty of this model we need some heuristics and consider some simplifications in Section~\ref{sec:heuristics}. Section~\ref{sec:tests} presents the experimental setup and in Section~\ref{sec:results} the results are shown. We conclude the paper in Section~\ref{sec:conclusion}. \\
+
+    This work was funded by the Portuguese Foundation for Science and Technology - FCT under ????, and by Zuse Institute Berlin - ZIB.
+
+\section{Model}
+\label{sec:model}
+
+\begin{table}[!htb]
+    %\caption{Global caption}
+      \centering
+      %\hspace{-2cm}
+          \resizebox{0.75\textwidth}{!}{
+\begin{tabular}{ |p{1.5cm}||p{5.3cm}|p{4cm}|  }
+     \hline
+     Parameter & Parameter Meaning & Parameter Range\\
+     \hline
+     \hline
+    $\cmss{C}^k$   &  Cost of maintaining component $k$   & $\mathbb{R}^{+}$\\
+    $\cmss{D}^k$  & Duration of component $k$'s maintenance & $\mathbb{N}$\\
+    $\cmss{E}_t$   & Demand at period $t$ & $\mathbb{R}^{+}$\\
+    $\mathcal{K}$   &  Components to be maintained & \\
+    \cmss{M} & Big constant to dominate constraint & $\mathbb{R}^{+}$\\
+    $\mathcal{N}$ & Set of machines & $\mathbb{N}$\\
+    $\cmss{Q}^k$   &  Maximum permissible production & $\mathbb{R}^{+}$\\
+    $\cmss{R}^k$   &  Maximum condition of component $k$  & $\mathbb{R}^{+}$\\
+    $\mathcal{T}$   &  Set of periods   & $\mathbb{N}$\\
+    $\mathcal{Z}$  & Set of maintenance implications & $\mathcal{K}^n \times \mathcal{K}^n$\\
+    
+    \hline
+    \end{tabular}
+    }
+      \caption{Description of the parameters used in the model}
+    \label{tab:abstract_parameter_description}
+\end{table}
+
+
+\begin{table}[!htb]
+      \centering
+          \resizebox{0.75\textwidth}{!}{
+
+\begin{tabular}{ |p{1.25cm}||p{6.5cm}|p{2.5cm}|  }
+     \hline
+     Variable & Variable Meaning & Variable Type\\
+     \hline
+     \hline
+    $x^k_{n,t}$   &  Maintenance of component $k$ of machine $n$ at period $t$   & Binary\\
+    $y_{n,t}$   &  Production of machine $n$ period $t$ & Continuous\\
+    $r^k_{n,t}$   &  Condition of component $k$ of machine $n$ at period $t$  & Continuous\\
+    \hline
+    \end{tabular}
+}
+        \caption{Description of the variables used in the model}
+        \label{tab:abstract_variable_description}    
+\end{table}
+
+Below we present a general formulation for the models we will be working with. The variables are represented by lowercase letters ($x,y,r$), parameters by uppercase letters with a different font (\cmss{C}, \cmss{Q}, \cmss{M}, etc.), and sets by uppercase letters with a third font ($\mathcal{N}, \mathcal{K}, \mathcal{Z}$). The subscript $n$ indicates machine $n$, $t$ the time period $t$, and the superscript $k$, component $k$. So $r_{n,t}^k$ is the variable $r$ for component $k$ of machine $n$ at the time period $t$.
+
+
+\begin{mini!}|l|[3]
+    {x,y}{\sum_{n \in \mathcal{N}}\sum_{t \in \mathcal{T}}\sum_{k \in \mathcal{K}^n} C^k \cdot x^k_{n,t}}
+{\label{con:cost_minimization_objective}}{}
+\addConstraint{\sum_{n \in \mathcal{N}} y_{n,t} \geq \cmss{E}_t \quad &\forall t \in \mathcal{T} \, \forall n \in \mathcal{N}}{\label{con:satisfy_demand}}
+\addConstraint{r_{n,t}^k \leq f_{n,k}(r_{n,t-1}^k, y_{n,t}; r_{n,t-1}^1, \dots, r_{n,t-1}^{|\mathcal{K}_n|}) + \cmss{M}\cdot x_{n,t}^k &\forall t,n,k}{\label{con:component_degradation}}
+\addConstraint{y_t \leq g_{n,k}(r_{n,t}^k) & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{\label{con:production_limit}}
+\addConstraint{y_{n,t} \leq (1-x^k_{n,t})\cdot \cmss{Q}^k \, & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{\label{con:maintenance_downtime}}
+\addConstraint{x^k_{n,i} \geq x^k_{n,t} - x^k_{n,t-1}\, & \forall n, k, t \leq i \leq t + \cmss{D}^k}{\label{con:maintenance_duration}}
+\addConstraint{x_{n,t}^k \leq x_{n,t}^{k^\prime} \, &\forall t \in \mathcal{T} \, \forall (k, k^\prime) \in \mathcal{Z}}{\label{con:maintenance_implications}}
+\addConstraint{x^k_{n,t} \in \{0,1\}}{}
+\addConstraint{y_{n,t} \geq 0}{}
+\addConstraint{0 \leq r^k_{n,t} \leq \cmss{R}^k_n}{}
+\label{model:abstract_formulation}
+\end{mini!}
+
+%Where $f$ and $g$ are convex functions.
+
+The objective of the model is to minimize the maintenance cost (added over all components of all machines in all time periods) while guaranteeing that the machines satisfy the demand in Constraints~\ref{con:satisfy_demand}. Constraints~\ref{con:component_degradation} model the evolution of the condition of the components. A big-M term represents the maintenance action which, in conjunction with the binary variable $x_{n,t}^k$ will simulate the replacement of the component. Function $f$ will model the (possibly nonlinear) degradation of the component, which depends on its previous condition, the current production, and possibly the condition of the other components of the same machine. Constraints~\ref{con:production_limit} enforce a (possibly nonlinear) upper bound on the production of a machine, based on the condition of its components. A machine with damaged components will not be able to produce as much as a new one. Constraints~\ref{con:maintenance_downtime} stipulate that the machines stop production while one of their components is being maintained, and Constraints~\ref{con:maintenance_duration} impose a predetermined duration for replacing the components. Finally, Constraints~\ref{con:maintenance_implications} represent the interactions between components regarding maintenance, where the replacement of some components forces the maintenance of others. 
+
+The following is a valid cut:
+
+\begin{equation*}
+x_{n,t}^k \leq x_{n,|\mathcal{T}|-\cmss{D}^k}^k, \quad \forall k, t \geq |\mathcal{T}| - \cmss{D}^k  
+\end{equation*}
+
+Since a maintenance action cannot be started if it does not have enough time to be finished.
+
+\section{Dantzig-Wolfe Reformulation}
+\label{sec:DW}
+    The formulation above exhibits a block diagonal structure with a set of complicating constraints. These are Constraints~\ref{con:satisfy_demand}, requiring that the demand must be satisfied, while the blocks are composed by the functioning of the independent machines. Dantzig-Wolfe decomposition is a method for solving problems with these attributes~\cite{Decomposition_Principle_for_Linear_Programs}. The nonlinearities in the formulation will appear in the pricing problem, thus not directly interfering with the algorithm. Another work with a nonlinear pricing problem can be found in~\cite{Exact_Methods_for_Recursive_Circle_Packing}. 
+    
+    In the master problem below, we aggregate subproblems if they correspond to identical machines, as they share the same set of possible solutions. With this aggregation, we expect that the usefulness of the reformulation will increase with the number of identical machines, given its symmetry-breaking characteristics. Thus, the value of $\lambda_{z,i}$ will tell us how many machines in the subgroup of identical machines $z$ will use solution $i$. The notation $\cmss{y}_{z,i,t}$ refers to the production of solution $i$ (from the subgroup $z$) at time $t$, and $\cmss{y}$ uses a different font to emphasize that in the master model it is a parameter. 
+
+\begin{mini!}|l|[3]
+{\lambda}{\sum_{z \in \mathcal{Z}}\sum_{i \in \mathcal{X}_z} c^\intercal \lambda_{z,i}}
+{}{}
+\addConstraint{\sum_{z \in \mathcal{Z}}\sum_{i \in \mathcal{X}_z} \lambda_{z,i} \cdot \cmss{y}_{z,i,t} \geq \cmss{E}_{t}, \quad & \forall t \in \mathcal{T} &\quad (\pi)}{\label{con:lambda_production_demand}}
+\addConstraint{\sum_{i \in \mathcal{X}_z} \lambda_{z,i} = |\mathcal{Z}_z|, & \forall z \in \mathcal{Z} &\quad (\pi_0)}{\label{con:lambda_satisfaction}}
+\addConstraint{0 \leq \lambda_{z,i} \leq |\mathcal{Z}_z|, & \forall z \in \mathcal{Z}}
+\end{mini!}
+
+Constraints~\ref{con:lambda_production_demand} stipulate that the chosen solutions must satisfy the production demand. Computationally speaking, it makes more sense to use an inequality rather than an inequality, as it tends to allow for a faster stabilization of the corresponding dual values. Constraints~\ref{con:lambda_satisfaction} enforce that each subgroup of identical machines can have at most \textit{size of the subgroup} solutions.
+
+This reformulation is solved with column generation, which will provide new patterns for each of the different sets of machines, looking for the ones with the lowest reduced cost. The dual variables from constraints~\ref{con:lambda_production_demand} will incentivize solutions with a higher production, while the maintenance cost will prevent solutions with too many maintenance actions. The generation of new patterns is obtained by the pricing problem below.
+
+\begin{mini!}|l|[3]
+{x,y}{C^\intercal x - \pi^\intercal y - \pi_0}
+{}{}
+\addConstraint{\text{Constraints~\ref{con:component_degradation}-~\ref{con:maintenance_implications} being satisfied}}{\label{con:machine_operation}}
+\addConstraint{y_t \leq \cmss{E}_t\, \forall t \in \mathcal{T}}{\label{con:demand_upper_bound}}
+\end{mini!}
+
+Given that the production is a variable in this subproblem, $y$ uses the variable font. 
+
+As the production demand is a clear upper bound on the production of any specific machine, Constraint~\ref{con:demand_upper_bound} is a valid cut.
+
+ The pricing problem can also be interpreted in the context of machine production. The objective function is equivalent to the maximization of the profit of a machine (where the selling price of the product at time $t$ is given by the corresponding dual value). The added valid inequality enforces a cap on production, after which the product can not be sold, simulating markets where there is limited demand.
+ An application of this problem to power transformers was introduced by Dionísio and Pedroso in~\cite{An_Optimization_Model_for_Power_Transformer_Maintenance}.
+
+As the pricing problem remains a MINLP, it is prohibitively expensive to solve it to optimality in every iteration.
+
+ 
+\section{Extended formulation implementation}
+
+\subsubsection{Branching}
+  Branching on fractional master variables is inefficient, and branching on the pricing variables is not possible, due to the aggregation of identical subproblems. 
+
+  After solving an iteration of the RMP, we sum the columns to find a maintenance decision $x$ with a fractional value. Adding the master variables that perform this maintenance action, the branching decision is to enforce that these variables must not exceed $\left \lfloor{k}\right \rfloor$ on the left branch, or that they must at least sum to $\left \lceil{k}\right \rceil$ on the right branch, where $k$ is the (necessarily fractional) sum of these master variables.
+
+  Mathematically, the left branch adds the constraint $\sum_{\lambda \mid x_\lambda = 1} \lambda \leq \left \lfloor{k}\right \rfloor$.
+
+\subsubsection{Initial columns generation}
+
+   We use Farkas' Pricing~\cite[p.~43]{Generic_Branch-Cut-and-Price} for initializing the RMP, and for fixing infeasibilities during the Branch-and-Price process. This technique uses Farkas' Lemma~\cite{Theorie_der_einfachen_Ungleichungen}, by finding a master variable that breaks the Lemma's statement and adding it to the RMP.
+
+\subsubsection{Choice of subproblem}
+
+  As the subproblems can be very difficult when solved exactly, we will use the results of the heuristic described in Section~\ref{sec:heuristics} to decide the order in which they should be solved. Subproblems with a more promissing heuristic result will be solved first. After getting a negative-reduced cost column, we advance to the next iteration, in order to get more up-to-date dual values. As the master problem is not difficult, in contrast with the pricing problem, using the best possible dual values is preferred.  
+
+\subsubsection{Parallelism}
+
+In decomposition approaches, solving the different subproblems in parallel can yield large speedups. While it is also possible to use parallelism to increase the speed of the compact formulation (see~\cite{Assessing_the_Effectiveness_of_(Parallel)_Branch-and-bound_Algorithms} for a review), this would take considerably more effort, both from a technical and a theoretical perspective. For this reason, it is our understanding that applying parallelism only to the decomposition approach is not unfair.
+
+
+\section{Heuristic \& Simplifications}
+\label{sec:heuristics}
+
+Realistic instances can quickly become intractable, due to the size of the problem, having many integer variables and potentially many nonlinear constraints.
+
+
+For that reason, we developed a heuristic that tries to deal with this. It is applied to the column generation process, and remains applicable if it is used to initialize the RMP (in other words, when solving the Farkas iterations). \\
+ An iterative refinement heuristic that would be applicable to this problem, can be found in~\cite{An_Optimization_Model_for_Power_Transformer_Maintenance}, whose idea is limiting the number of maintenance possibilities, and expanding them with every iteration. As this work was already published, and did not yield a large improvement, we omit it from this paper. 
+
+\subsubsection{PF} This production-fixing heuristic tries to take advantage of the impact that the production variable has on the model. Given a fixed production vector, the idea is to perform maintenance at the last possible moment, where if any maintenance action were to be delayed by one time period, the solution would be infeasible. This maintenance strategy is called just-in-time maintenance. For a fixed production vector, Constraints~\ref{con:production_limit} will fix the condition of the components, sans the maintenance. Heuristically, the fixed production vector is chosen given the farkas duals or the actual duals of the current iteration. Assuming a normal distribution with mean and standard deviation provided by these duals, the duals that are more unlikely to happen will be benefited. %Heuristically, the decision of which values the variables should be fixed to is being done with pattern-search (also known as the Hooke-Jeeves method)~\cite{Direct_Search_Solution_of_Numerical_and_Statistical_Problems}, where each variable is independently increased and decreased, and improving moves are saved. The algorithm iterates over all the variables until either a time limit or a local optimum is reached. 
+
+Even if we pick the best possible production vector, this heuristic is not optimal. This is due to the interaction between the components when it comes to their degradation, but also to the maintenance implication constraints (\ref{con:maintenance_implications}). See the following example. 
+
+
+\begin{example}
+    Suppose that we are studying machines with two components, \cmss{A} and \cmss{B}, and that the maintenance of the \cmss{B} implies the maintenance of component \cmss{A}. Assume also that we have the best possible production for this heuristic. It may happen that component \cmss{A} is maintained in year $x$, and the \cmss{B} component (and consequently, \cmss{A}) in year $y > x$. However, it is possible that maintaining \cmss{B} in year $x$ also leads to a feasible solution, which would save us one maintenance of the \cmss{A} component. For example, if the total number of periods is $y+1$, it can happen that both components could have been maintained at $x$ and still reached the end without failing. This anticipation of the maintenance gives a solution that is strictly better than the one we started with. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.5\textwidth]{Media/contraction_example.png}
+    \caption{Example of the greedy solution not being optimal}
+    \label{fig:bad_greedy_solution}
+\end{figure}
+
+    Note, however, that if the bottom solution is feasible, then it is guaranteed to be an optimal solution. By construction, the original solution tells us that component \cmss{B} requires one maintenance action at $y$ at the latest, and component \cmss{A} also requires one at $x$ at the latest.
+    
+    The study of these types of operations is interesting, but out of scope for the present paper. In a future iteration of this heuristic, they may be used to improve it.
+\label{ex:non_optimal_JIT_maintenance}
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Below follows the production-fixing algorithm used in this work. ??? WORK IN PROGRESS ???
+
+
+\begin{algorithm}[H]%[H]
+  \SetAlgoLined
+  \KwData{$\pi$}
+  
+  production $\leftarrow$ getProduction($\pi$)\;
+  $y_t \leftarrow$ production[t]\;
+  $r^k_0 \leftarrow \cmss{R}^k, \forall k$\;
+  $x^k_t \leftarrow 0, \forall k,t$\;
+  
+  \While{$t \leq |\mathcal{T}|$}{
+
+    \For{$k \in \mathcal{K}^n$}{
+      \If{$x^k_t = 1$}{
+        continue\;
+      }
+      $r^k_t \leftarrow f_{n,k}(r_{n,t-1}^k, y_{n,t}; r_{n,t-1}^1, \dots, r_{n,t-1}^{|\mathcal{K}_n|})$\;
+      \If {$y_t > g_{k}(r^k_{t})$}{
+        \For{$t^\prime \in [t .. t + \cmss{D}^{k}]$}{
+            $y_{t^\prime} \leftarrow 0$\;
+            $x^{k}_{t^\prime} \leftarrow 1$\;
+            $r^{k}_{t^\prime} \leftarrow \cmss{R}^{k}$\;
+        }
+
+        maintenanceDependencies($r,y,m$)\;
+       
+        }
+        $t \leftarrow t-1$\;
+        break\;
+      }
+      
+      
+    t $\leftarrow$ t+1\;
+    }
+  
+
+  variables $\leftarrow [y,m,r]$\;
+  result $\leftarrow \sum_{t \in \mathcal{T}}\sum_{k \in \mathcal{K}^n} x^k_t \cdot \cmss{C}^k$\; 
+  
+  \Return variables, result\;
+  \caption{PF-heuristic}
+  \label{algo:PF}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{algorithm}[h]%[H]
+  \SetAlgoLined
+  \KwData{$\pi$}
+  %\KwResult{how to write algorithm with \LaTeX2e }
+    mean $\leftarrow$ mean($\pi$)\;
+    std $\leftarrow$ std($\pi$)\;
+
+    \For{$i \in \mathcal{T}$}{
+      production[i] $\leftarrow$ probability[t] $\cdot$ \cmss{E}[t]/$|\mathcal{N}|$ \;
+      production[i] $\leftarrow$ min(production[i], $\cmss{Q}^k$)$, \forall k$\;
+    }
+
+    \Return production\;
+  \caption{getProduction}
+  \label{algo:getProduction}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{algorithm}[h]%[H]
+  \SetAlgoLined
+  \KwData{$r,y,m$}
+
+  \Do{$\text{\upshape addedMaintenance = TRUE}$}{
+    addedMaintenance $\leftarrow$ FALSE\;
+    \For{$k^\prime \in \mathcal{K}^n$}{
+      \If{$\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{Z} \land x^{k^{\prime\prime}}_t > x^{k^\prime}_t$}{
+        addedMaintenance $\leftarrow$ TRUE\;
+        \For{$t^\prime \in [t .. t + \cmss{D}^{k^\prime}]$}{
+      $y_{t^\prime} \leftarrow 0$\;
+      $x^{k^\prime}_{t^\prime} \leftarrow 1$\;
+      $r^{k^\prime}_{t^\prime} \leftarrow \cmss{R}^{k^\prime}$\;
+      }
+    }
+    }
+
+  }
+
+  \Return $r,m,y$\;
+  \caption{maintenanceDependencies}
+  \label{algo:maintenanceDependencies}
+\end{algorithm}
+
+??? ALGO DESCRIPTION ALGO DESCRIPTION ALGO DESCRIPTION
+Starting with the description of the auxiliary procedure getProduction, 
+Now moving onto the main procedure, PF, we start by calling getProduction in line $2$ to obtain the production vector, using the dual values given by the current iteration of the master problem. Setting the
+
+A lot more work can go into this heuristic. The choice of the production vector in Algorithm~\ref{algo:getProduction} should be more substantiated, and the results mentioned in the beginning of the section regarding maintenance anticipation should also provide better results. 
+
+\iffalse
+\subsubsection{1M}
+
+This heuristic takes the same initial observation of the PF heuristic, that the production has a disproportionate impact in the model, and assigns a production vector to each machine proportional to the number of machines. This heuristic can be thought of as the previous heuristic with a production vector of $1/|\mathcal{N}|$, but still with freedom on the remaining variables, even if they are heavily constrained. It works best when the machines are similar. If that is not the case, the production can be fixed to values proportional to the effectiveness of the machines, according to some heuristic decision.
+
+The model is optimized for a single machine with the production vector assigned to it, and its solution is then copied to the remaining ones.
+
+If we have only one type of machine, diving the demand by the number of machines can give us a near-optimal solution. However, this is not necessarily true, as the following example shows.
+
+\begin{example}
+    For simplicity, assume that we are studying machines with a single component, component $A$, and that there are $n$ identical machines to be maintained. Choosing appropriate parameters, suppose that by dividing the demand by $n$, the number of machines, and assigning that demand to one machine, component $A$ does not require maintenance if the number of considered periods is less than \cmss{T}, but requires one maintenance action when they equal \cmss{T}. Then, assigning maintenance to $A$ at time period $\cmss{T}-1$ would give us an optimal solution, one obtainable by the heuristic. Copying this solution to the remaining machines means that the fleet ends the study with very healthy components. Again, by choosing appropriate parameters, the demand of the final time period may be satisfiable by a proper subset of the fleet. This means that the complement of this subset incurred unnecessary maintenance, and thus the heuristic did not produce an optimal solution. 
+\label{ex:sub_optimal_1M}
+\end{example}
+\fi
+
+\subsection{Simplifications}
+
+This model may quickly become very large, depending on the number of periods being considered, but even for average-sized instances, it can be quite difficult to solve. 
+
+To cope with this, we assume that there are different time periods for production and maintenance decisions. For example, while production decisions are made every hour, maintenance might be planned on a biyearly basis. This forces minor modifications to the formulations, and some more significant ones, as the constraints that combine both $y$ and $x$ variables (like~\ref{con:component_degradation}) need to use the proper indices.
+
+Despite having a big impact on the tractability of the models, this simplification also falls in line with real-world applications, since maintenance decisions are naturally made on a much more granular scale than production decisions.
+
+
+\section{Benchmark Instances Used}
+\label{sec:tests}
+
+ ??? SLIGHTLY OUTDATED ??? 
+
+ In this section, we will detail the experimental setup that was used to validate the model, as well as the metrics used. All the code and experiment results can be found in~\cite{github-repo}.?????? STILL NEED TO PUSH
+
+ The instances were randomly generated. They are divided by the number of time periods (either $20$ or $50$), by the number of machines, with some being identical, by the integrality requirements, and they can have ``high'' or ``low'' complexity, meaning that the corresponding machines will have a higher or lower number of components, with more or less interaction between them, respectively. The complexity of the components also affects the degree of nonlinearity in the model.
+
+ It is easy to create instances that favor each of the models, as having more identical machines favors the extended formulation. For this reason, we have opted for creating two sets of instances, with one of them having several identical machines, and the other having fewer.
+ 
+ We ran both formulations, the compact and the extended models, with a $2h$ time limit.
+
+Each of the results represents the average of $10$ randomly generated instances according to the relevant specification (all with the same complexity, time periods, number of machines). The Time column will show the average time to optimality, for the instances where optimality is achieved, and the Gap (\%) column will show the average Gap for the instances where it was not. The gap is the relative gap: $\frac{|\text{primal bound} - \text{dual bound}|}{ \min(|\text{primal bound}|, |\text{dual bound}|)}$.
+
+ 
+The experiments were run on two 6-Core Intel Core i7 with 64 GB running at 3.20GHz. They ran the models with the SCIP solver, version 8.0.0~\cite{scip8.0}. For the implementation, we used its Python interface, PySCIPOpt~\cite{PySCIPOPT}. Some scripts (most importantly visualization with Matplotlib~\cite{matplotlib}) were implemented in Python version 3.7.9.
+
+
+\section{Results and Analysis}\label{sec:results}
+
+???
+FIGURES $>$ TABLES?
+HOW MANY INSTANCES?
+WHAT TO VARY?
+
+\begin{table}[!htb]
+  \caption{Comparing effect of time}
+
+  \scalebox{0.9}{
+  \begin{minipage}{.5\linewidth}
+    \caption{Results for $\mathcal{T} = 20$}
+    \centering
+      \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Model & $\mathcal{N}$ & Complexity & Time(s) & Gap (\%) \\
+        \hline
+        Compact & ??? & ??? & ??? & ??? \\
+        DW & ??? & ??? & ??? & ??? \\
+        DW + PF & ??? & ??? & ??? & ??? \\
+        \hline
+      \end{tabular}
+  \end{minipage}
+  }
+  \scalebox{0.9}{
+  \begin{minipage}{.5\linewidth}
+    \centering
+      \caption{Results for $\mathcal{T} = 50$}
+      \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Model & $\mathcal{N}$ & Complexity & Time(s) & Gap (\%) \\
+        \hline
+        Compact & ??? & ??? & ??? & ??? \\
+        DW & ??? & ??? & ??? & ??? \\
+        DW + PF & ??? & ??? & ??? & ??? \\
+        \hline
+      \end{tabular}
+  \end{minipage} 
+  }
+\end{table}
+
+
+
+\begin{table}[!htb]
+  \caption{Comparing effect of different machines}
+  
+  \scalebox{0.9}{
+  \begin{minipage}{.5\linewidth}
+    \caption{Results for $\mathcal{N} = ???$}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+        Model & $\mathcal{T}$ & Complexity & Time(s) & Gap (\%) \\
+        \hline
+        Compact & ??? & ??? & ??? & ??? \\
+        DW & ??? & ??? & ??? & ??? \\
+        DW + PF & ??? & ??? & ??? & ??? \\
+        \hline
+      \end{tabular}
+  \end{minipage}
+  }
+  \scalebox{0.9}{
+  \begin{minipage}{.5\linewidth}
+    \centering
+      \caption{Results for $\mathcal{N} = ???$}
+      \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Model & $\mathcal{T}$ & Complexity & Time(s) & Gap (\%) \\
+        \hline
+        Compact & ??? & ??? & ??? & ??? \\
+        DW & ??? & ??? & ??? & ??? \\
+        DW + PF & ??? & ??? & ??? & ??? \\
+        \hline
+      \end{tabular}
+  \end{minipage} 
+  }
+\end{table}
+
+
+
+\begin{table}[!htb]
+  \caption{Comparing effect of machine complexity}
+
+  \begin{minipage}{.5\linewidth}
+    \caption{Results for low complexity}
+    \centering
+      \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Model & $\mathcal{N}$ & $\mathcal{T}$ & Time(s) & Gap (\%) \\
+        \hline
+        Compact & ??? & ??? & ??? & ??? \\
+        DW & ??? & ??? & ??? & ??? \\
+        DW + PF & ??? & ??? & ??? & ??? \\
+        \hline
+      \end{tabular}
+  \end{minipage}
+  \begin{minipage}{.5\linewidth}
+    \centering
+      \caption{Results for high complexity}
+      \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Model & $\mathcal{N}$ & $\mathcal{T}$ & Time(s) & Gap (\%) \\
+        \hline
+        Compact & ??? & ??? & ??? & ??? \\
+        DW & ??? & ??? & ??? & ??? \\
+        DW + PF & ??? & ??? & ??? & ??? \\
+        \hline
+      \end{tabular}
+  \end{minipage} 
+\end{table}
+
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+This article presented a MINLP for deciding how to best allocate production, subjected to a predetermined demand, with the objective of minimizing maintenance cost. Besides the compact model, we also developed a Dantzig-Wolfe reformulation, and additional heuristics due to the model's difficulty. %Even without the heuristic, we can optimally solve more instances (and those we can't, we achieve a much lower gap) than the ones originally achieved by us in~\cite{A_Mixed-Integer_Optimization_Model_for_Efficient_Power_Transformer_Maintenance_and_Operation}, hinting that the reformulations we implemented resulted in a better model. 
+
+    The model is able to solve multiple medium-sized instances to optimality, but on larger instances, the difficulty grows rapidly. The heuristic has trouble reaching optimality but can obtain good solutions very quickly, and in larger instances, it even gets better results that the original model. These results leave us optimistic that we can decrease the granularity of small and medium-sized instances, and still obtain good solutions.% We based the data characterizing a power transformer on the information we could discover in the literature~\cite{cigre445}, due to the lack of quality real-world data available. 
+   
+     The Dantzig-Wolfe reformulation can still be improved, as the heuristic used to generate new columns does not fully utilize the duals provided by the master problem. Doing multiple iterations of the cheap pricing problem while adding benders-like optimality cuts, could be a better strategy for faster convergence. ??????
+
+  A different extended formulation shows promising results, by reducing the number of costly pricing rounds. The idea is to generate maintenance patterns and production patterns (patterns being a concrete assignment to the corresponding variables) in different pricing problems. The formulation we arrived at requires more theory than this one, as it requires the simultaneous generation of columns and rows. See~\cite{Simultaneous_column-and-row_generation} for more details on column-and-row generation.
+
+  On the modeling side, more than one type of maintenance action can make the model more interesting. It increases its difficulty, but it also makes it more realistic, as complete replacement of a component is usually not the only option. The model can also become more general. For example, there might be non-critical components that may be maintained while still allowing for some production of the machine. Another example is the production upper bound in Constraints\ref{con:production_limit}, which might depend not only on the condition of individual components, but also on the joint condition of multiple components.
+
+  Finally, the application of these techniques in real-world scenarios is also desirable. 
+%    Bibliographies can be prepared with BibTeX using amsplain,
+%    amsalpha, or (for "historical" overviews) natbib style.
+%\bibliographystyle{amsplain}
+
+
+\bibliographystyle{plainurl}
+\bibliography{bibliography}
+%    Insert the bibliography data here.
+
+
+\end{document}
