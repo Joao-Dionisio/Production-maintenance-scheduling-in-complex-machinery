@@ -9,17 +9,28 @@
 \newblock D011S018R004.
 \newblock \href {https://arxiv.org/abs/https://onepetro.org/SPEADIP/proceedings-pdf/20ADIP/1-20ADIP/D011S018R004/2378389/spe-202869-ms.pdf} {\path{arXiv:https://onepetro.org/SPEADIP/proceedings-pdf/20ADIP/1-20ADIP/D011S018R004/2378389/spe-202869-ms.pdf}}, \href {https://doi.org/10.2118/202869-MS} {\path{doi:10.2118/202869-MS}}.
 
-\bibitem{scip8.0}
-Ksenia Bestuzheva, Mathieu Besan{\c{c}}on, Wei-Kun Chen, Antonia Chmiela, Tim Donkiewicz, Jasper van Doornmalen, Leon Eifler, Oliver Gaul, Gerald Gamrath, Ambros Gleixner, Leona Gottwald, Christoph Graczyk, Katrin Halbig, Alexander Hoen, Christopher Hojny, Rolf van~der Hulst, Thorsten Koch, Marco L{\"u}bbecke, Stephen~J. Maher, Frederic Matter, Erik M{\"u}hmer, Benjamin M{\"u}ller, Marc~E. Pfetsch, Daniel Rehfeldt, Steffan Schlein, Franziska Schl{\"o}sser, Felipe Serrano, Yuji Shinano, Boro Sofranac, Mark Turner, Stefan Vigerske, Fabian Wegscheider, Philipp Wellner, Dieter Weninger, and Jakob Witzig.
-\newblock {The SCIP Optimization Suite 8.0}.
-\newblock Technical report, Optimization Online, December 2021.
-\newblock URL: \url{http://www.optimization-online.org/DB_HTML/2021/12/8728.html}.
+\bibitem{A_Two-Stage_Framework_for_Power_Transformer_Asset_Maintenance_Management—Part_I:_Models_and_Formulations}
+Amir Abiri-Jahromi, Masood Parvania, François Bouffard, and Mahmud Fotuhi-Firuzabad.
+\newblock A two-stage framework for power transformer asset maintenance management—part i: Models and formulations.
+\newblock {\em IEEE Transactions on Power Systems}, 28(2):1395--1403, 2013.
+\newblock \href {https://doi.org/10.1109/TPWRS.2012.2216903} {\path{doi:10.1109/TPWRS.2012.2216903}}.
+
+\bibitem{Security_Constrained_Economic_Dispatch_Using_Nonlinear_Dantzig-Wolfe_Decomposition}
+Muhamed Aganagic and Safoura Mokhtari.
+\newblock Security constrained economic dispatch using nonlinear dantzig-wolfe decomposition.
+\newblock {\em IEEE Transactions on Power Systems}, 12, 02 1997.
+\newblock \href {https://doi.org/10.1109/59.574929} {\path{doi:10.1109/59.574929}}.
 
 \bibitem{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling}
 Thomas Bittar, Pierre Carpentier, Jean-Philippe Chancelier, and J{\'e}r{\^o}me Lonchampt.
 \newblock A decomposition method by interaction prediction for the optimization of maintenance scheduling.
 \newblock {\em Annals of Operations Research}, 316(1):229--267, Sep 2022.
 \newblock \href {https://doi.org/10.1007/s10479-021-04460-y} {\path{doi:10.1007/s10479-021-04460-y}}.
+
+\bibitem{scip9.0}
+Suresh Bolusani, Mathieu Besançon, Ksenia Bestuzheva, Antonia Chmiela, João Dionísio, Tim Donkiewicz, Jasper van Doornmalen, Leon Eifler, Mohammed Ghannam, Ambros Gleixner, Christoph Graczyk, Katrin Halbig, Ivo Hedtke, Alexander Hoen, Christopher Hojny, Rolf van~der Hulst, Dominik Kamp, Thorsten Koch, Kevin Kofler, Jurgen Lentz, Julian Manns, Gioni Mexi, Erik Mühmer, Marc~E. Pfetsch, Franziska Schlösser, Felipe Serrano, Yuji Shinano, Mark Turner, Stefan Vigerske, Dieter Weninger, and Lixing Xu.
+\newblock The scip optimization suite 9.0, 2024.
+\newblock \href {https://arxiv.org/abs/2402.17702} {\path{arXiv:2402.17702}}.
 
 \bibitem{Decomposition_Principle_for_Linear_Programs}
 George~B. Dantzig and Philip Wolfe.
@@ -49,6 +60,12 @@ M.~Geurtsen, Jeroen~B.H.C. Didden, J.~Adan, Z.~Atan, and I.~Adan.
 \newblock {\em European Journal of Operational Research}, 305(2):501--529, 2023.
 \newblock URL: \url{https://www.sciencedirect.com/science/article/pii/S0377221722002673}, \href {https://doi.org/10.1016/j.ejor.2022.03.045} {\path{doi:10.1016/j.ejor.2022.03.045}}.
 
+\bibitem{Integrated_production_and_maintenance_scheduling_for_a_single_degrading_machine_with_deterioration-based_failures}
+Mageed Ghaleb, Sharareh Taghipour, Mani Sharifi, and Hossein Zolfagharinia.
+\newblock Integrated production and maintenance scheduling for a single degrading machine with deterioration-based failures.
+\newblock {\em Computers \& Industrial Engineering}, 143:106432, 2020.
+\newblock URL: \url{https://www.sciencedirect.com/science/article/pii/S0360835220301662}, \href {https://doi.org/10.1016/j.cie.2020.106432} {\path{doi:10.1016/j.cie.2020.106432}}.
+
 \bibitem{Exact_Methods_for_Recursive_Circle_Packing}
 Ambros Gleixner, Stephen~J. Maher, Benjamin Müller, and João~Pedro Pedroso.
 \newblock Price-and-verify: a new algorithm for recursive circle packing using dantzig–wolfe decomposition.
@@ -71,6 +88,12 @@ J.~D. Hunter.
 Joao-Dionisio.
 \newblock Production-maintenance-scheduling-in-complex-machinery.
 \newblock \url{https://github.com/Joao-Dionisio/Production-maintenance-scheduling-in-complex-machinery}, 2024.
+
+\bibitem{markovian_model_liang_2018}
+Zhenglin Liang and Ajith Parlikad.
+\newblock A markovian model for power transformer maintenance.
+\newblock {\em International Journal of Electrical Power \& Energy Systems}, 99:175--182, 2018.
+\newblock URL: \url{https://www.sciencedirect.com/science/article/pii/S0142061517321312}, \href {https://doi.org/10.1016/j.ijepes.2017.12.024} {\path{doi:10.1016/j.ijepes.2017.12.024}}.
 
 \bibitem{PySCIPOPT}
 Stephen Maher, Matthias Miltenberger, Jo{\~{a}}o~Pedro Pedroso, Daniel Rehfeldt, Robert Schwarz, and Felipe Serrano.

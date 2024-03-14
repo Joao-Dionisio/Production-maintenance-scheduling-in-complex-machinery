@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex Paper"] 1710243143 "Paper.aux" "Paper.bbl" "Paper" 1710243145 0
-  "./bibliography.bib" 1707729511 61169 4b8018ae632db7a4cc5eabe55f475284 ""
+["bibtex Paper"] 1710423345 "Paper.aux" "Paper.bbl" "Paper" 1710423467 0
+  "./bibliography.bib" 1710420389 63215 076662214df65b97509d3986ffa011c1 ""
   "/usr/local/texlive/2023/texmf-dist/bibtex/bst/urlbst/plainurl.bst" 1675116457 33495 46cfb45e24a877059f9f7e142c7fc61c ""
-  "Paper.aux" 1710243144 8647 4b8f69f7ed49eafdaf045551bcff45a7 "pdflatex"
+  "Paper.aux" 1710423467 9410 64df35564e7278a80d8d593d752aa627 "pdflatex"
   (generated)
   "Paper.bbl"
   "Paper.blg"
   (rewritten before read)
-["pdflatex"] 1710243143 "/home/dionisio/Desktop/Doutoramento/Trabalho/LaTeX/Compact and DW-reformulation/Paper.tex" "Paper.pdf" "Paper" 1710243145 0
-  "/home/dionisio/Desktop/Doutoramento/Trabalho/LaTeX/Compact and DW-reformulation/Paper.tex" 1710243141 38784 4000a3f45ef0c34f36b77518c0501511 ""
+["pdflatex"] 1710423466 "/home/dionisio/Desktop/Doutoramento/Trabalho/LaTeX/Compact and DW-reformulation/Paper.tex" "Paper.pdf" "Paper" 1710423467 0
+  "/home/dionisio/Desktop/Doutoramento/Trabalho/LaTeX/Compact and DW-reformulation/Paper.tex" 1710423466 42241 22e759f61a597fdf26183c6ae0e36e94 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm0900.tfm" 1136768653 1536 c4f439db76ef96a9c53bc437f35ffe20 ""
@@ -222,10 +222,10 @@
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1700689992 8213603 759e6c00b366e139e238f7b560cfbad8 ""
   "/usr/local/texlive/2023/texmf.cnf" 1700689942 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
   "Media/contraction_example.png" 1700684128 4162 eb131d6f0a1abbf501817bc536253c8f ""
-  "Paper.aux" 1710243144 8647 4b8f69f7ed49eafdaf045551bcff45a7 "pdflatex"
-  "Paper.bbl" 1710243143 6802 5e0283043f8bc8cbccb7b5adbad42bce "bibtex Paper"
-  "Paper.out" 1710243144 325 974aaca6c384f87d82b1514aa0d1dd9e "pdflatex"
-  "Paper.tex" 1710243141 38784 4000a3f45ef0c34f36b77518c0501511 ""
+  "Paper.aux" 1710423467 9410 64df35564e7278a80d8d593d752aa627 "pdflatex"
+  "Paper.bbl" 1710423345 8505 405b2621cb4fd243f3757a34fa00342d "bibtex Paper"
+  "Paper.out" 1710423467 325 974aaca6c384f87d82b1514aa0d1dd9e "pdflatex"
+  "Paper.tex" 1710423466 42241 22e759f61a597fdf26183c6ae0e36e94 ""
   "llncs.cls" 1700684128 42256 f4ae8379a1ae24ecf56d0dde5ad0b308 ""
   (generated)
   "Paper.aux"

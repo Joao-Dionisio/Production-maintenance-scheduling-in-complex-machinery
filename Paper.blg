@@ -9,50 +9,51 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: bibliography.bib
 Warning--I'm ignoring Theorie_der_einfachen_Ungleichungen's extra "title" field
---line 19 of file bibliography.bib
+--line 62 of file bibliography.bib
+Warning--I didn't find a database entry for ""
 Warning--to sort, need author, editor, or key in cigre445
 Warning--to sort, need editor, organization, or key in Artificial_Intelligence_Application_for_Just_in_Time_Maintenance
 Warning--empty author and editor in cigre445
 Warning--empty school in Generic_Branch-Cut-and-Price
-You've used 17 entries,
+You've used 21 entries,
             2943 wiz_defined-function locations,
-            783 strings with 10815 characters,
-and the built_in function-call counts, 9098 in all, are:
-= -- 938
-> -- 451
+            815 strings with 12280 characters,
+and the built_in function-call counts, 10996 in all, are:
+= -- 1144
+> -- 511
 < -- 3
-+ -- 174
-- -- 151
-* -- 657
-:= -- 1342
-add.period$ -- 63
-call.type$ -- 17
-change.case$ -- 122
++ -- 201
+- -- 167
+* -- 776
+:= -- 1598
+add.period$ -- 78
+call.type$ -- 21
+change.case$ -- 141
 chr.to.int$ -- 0
-cite$ -- 21
-duplicate$ -- 211
-empty$ -- 751
-format.name$ -- 151
-if$ -- 2256
+cite$ -- 25
+duplicate$ -- 255
+empty$ -- 932
+format.name$ -- 167
+if$ -- 2750
 int.to.chr$ -- 0
-int.to.str$ -- 17
-missing$ -- 12
-newline$ -- 98
-num.names$ -- 32
-pop$ -- 206
+int.to.str$ -- 21
+missing$ -- 16
+newline$ -- 121
+num.names$ -- 40
+pop$ -- 245
 preamble$ -- 1
-purify$ -- 107
+purify$ -- 123
 quote$ -- 0
-skip$ -- 549
+skip$ -- 682
 stack$ -- 0
-substring$ -- 328
-swap$ -- 62
-text.length$ -- 27
+substring$ -- 429
+swap$ -- 77
+text.length$ -- 39
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 65
+type$ -- 81
 warning$ -- 4
-while$ -- 47
-width$ -- 19
-write$ -- 216
-(There were 5 warnings)
+while$ -- 58
+width$ -- 23
+write$ -- 267
+(There were 6 warnings)
