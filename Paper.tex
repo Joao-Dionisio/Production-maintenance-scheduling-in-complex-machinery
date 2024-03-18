@@ -121,9 +121,9 @@ Long-term maintenance of machines with costly components has been studied throug
 
 In this article, we present a MINLP with the objective of minimizing the maintenance cost of machines composed of multiple components, that must satisfy a predetermined continuous demand of a product. We also present a Dantzig-Wolfe reformulation. Additionally, we develop heuristics to aid in the solving of these difficult models.
 
-\subsubsection{Production-maintenance scheduling} ?????? EXPAND ON THE BACKGROUND ????? This problem belongs to the class of production-maintenance scheduling problems with parallel machines - see Geurtsen et al.~\cite{Production_maintenance_and_resource_scheduling_A_review} for a comprehensive literature review. Many variants of this problem exist and have been studied for decades, albeit less than other more classical problems. The majority of the literature looks at linear variants of this problem (see~\cite{Scheduling_jobs_with_time_resource_tradeoff_via_nonlinear_programming} for a resource-production exception), mostly because physical considerations tend to be ignored in more abstract models. Other authors avoid the nonlinearities by modeling machine failure with a random distribution~\cite{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling, Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}, sometimes with Markov chains~\cite{}. In these stochastic models, a few authors perform Bender's decomposition~\cite{Integrated_production_and_maintenance_scheduling_for_a_single_degrading_machine_with_deterioration-based_failures}.
+\subsubsection{Production-maintenance scheduling} ?????? EXPAND ON THE BACKGROUND ????? This problem belongs to the class of production-maintenance scheduling problems with parallel machines - see Geurtsen et al.~\cite{Production_maintenance_and_resource_scheduling_A_review} for a comprehensive literature review. Many variants of this problem exist and have been studied for decades, albeit less than other more classical problems. The majority of the literature looks at linear variants of this problem (see~\cite{Scheduling_jobs_with_time_resource_tradeoff_via_nonlinear_programming} for a resource-production exception), mostly because physical considerations tend to be ignored in more abstract models. Other authors avoid the nonlinearities by modeling machine failure with a random distribution~\cite{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling, Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}, sometimes with Markov chains~\cite{Integrated_maintenance_planning_and_production_scheduling_with_Markovian_deteriorating_machine_conditions}. In these stochastic models, a few authors perform Bender's decomposition~\cite{Integrated_production_and_maintenance_scheduling_for_a_single_degrading_machine_with_deterioration-based_failures}.
 
-Besides Bender's, some recent works have also used Dantzig-Wolfe decomposition, in a manner similar to ours. Insert name of guy here explored the possibility of using blablabla in his PhD thesis cite.
+In $2022$, Pries defended a thesis~\cite{Selected_topics_on_integrated_production-scheduling_and_maintenance-planning_problems} which bears some similarity with this work, in a manner similar to ours. Insert name of guy here explored the possibility of using blablabla in his PhD thesis.
 
 It is also common to decouple the maintenance and the production decisions, to make the model more tractable~\cite{A_Two-Stage_Framework_for_Power_Transformer_Asset_Maintenance_Management—Part_I:_Models_and_Formulations}. Not performing these decisions at the same time allows the decision horizon for maintenance to be longer, but loses reliability as a result of the assumptions on the production. 
 
@@ -141,7 +141,7 @@ Our work differs from the ones we could find, since we are not assuming that our
 
   In terms of applications, this model can be used for minimizing maintenance costs of power transformer fleets, where the ``product'' is electricity, or in water treatment stations, where the ``product'' is clean water. More abstractly, it can also be understood as production-maintenance scheduling in factories working in parallel with different interacting machines. \\
 
-  This article is organized as follows: Section~\ref{sec:intro} frames the problem and provides a light background on production-maintenance problems and on maintenance practices, besides presenting the related work. In Section~\ref{sec:model}, the compact formulation is presented. Section~\ref{sec:DW} shows the Dantzig-Wolfe reformulation of this compact model, alongside implementation details. Due to the difficulty of this model we need some heuristics and consider some simplifications in Section~\ref{sec:heuristics}. Section~\ref{sec:tests} presents the experimental setup and in Section~\ref{sec:results} the results are shown. We conclude the paper in Section~\ref{sec:conclusion}. \\
+  This article is organized as follows: Section~\ref{sec:intro} frames the problem and provides a light background on production-maintenance problems and on maintenance practices, besides presenting the related work. In Section~\ref{sec:model}, the compact formulation is presented. Section~\ref{sec:DW} shows the Dantzig-Wolfe reformulation of this compact model, with implementation details appearing in Section~\ref{sec:implementation}. Due to the difficulty of this model we need some heuristics and consider some simplifications in Section~\ref{sec:heuristics}. Section~\ref{sec:tests} presents the experimental setup and in Section~\ref{sec:results} the results are shown and discussed. We conclude the paper in Section~\ref{sec:conclusion}. \\
 
     This work was funded by the Portuguese Foundation for Science and Technology - FCT under ????, and by Zuse Institute Berlin - ZIB.
 
@@ -225,7 +225,7 @@ Since a maintenance action cannot be started if it does not have enough time to 
 
 \section{Dantzig-Wolfe Reformulation}
 \label{sec:DW}
-    The formulation above exhibits a block diagonal structure with a set of complicating constraints. These are Constraints~\eqref{con:satisfy_demand}, requiring that the demand must be satisfied, while the blocks are composed of the constraints describing the functioning of the independent machines. Dantzig-Wolfe decomposition is a method for solving problems with these attributes~\cite{Decomposition_Principle_for_Linear_Programs}. The nonlinearities in the formulation will appear in the pricing problem, thus not directly interfering with the algorithm. Other works with nonlinear pricing problems can be found in~\cite{Exact_Methods_for_Recursive_Circle_Packing, Security_Constrained_Economic_Dispatch_Using_Nonlinear_Dantzig-Wolfe_Decomposition} ADD MORE PAPERS HERE. 
+    The formulation above exhibits a block diagonal structure with a set of complicating constraints. These are Constraints~\eqref{con:satisfy_demand}, requiring that the demand must be satisfied, while the blocks are composed of the constraints describing the functioning of the independent machines. Dantzig-Wolfe decomposition is a method for solving problems with these attributes~\cite{Decomposition_Principle_for_Linear_Programs}. The nonlinearities in the formulation will appear in the pricing problem, thus not directly interfering with the algorithm. Example of other works with nonlinear pricing problems can be found in~\cite{Exact_Methods_for_Recursive_Circle_Packing, Security_Constrained_Economic_Dispatch_Using_Nonlinear_Dantzig-Wolfe_Decomposition, Branch-and-price_for_a_class_of_nonconvex_mixed-integer_nonlinear_programs}. 
     
     In the master problem below, we aggregate subproblems if they correspond to identical machines, as they share the same set of possible solutions. With this aggregation, we expect that the usefulness of the reformulation will increase with the number of identical machines, given its symmetry-breaking characteristics. Thus, the value of $\lambda_{z,i}$ will tell us how many machines in the subgroup $z$ of identical machines will use solution $i$. The notation $\cmss{y}_{z,i,t}$ refers to the production in solution $i$ (from the subgroup $z$) at time $t$, and $\cmss{y}$ uses a different font to emphasize that in the master model it is a parameter. 
 
@@ -259,6 +259,15 @@ As the pricing problem remains a MINLP, it is prohibitively expensive to solve i
 
  
 \section{Extended formulation implementation}
+\label{sec:implementation}
+
+\subsubsection{Initial columns generation}
+
+   We use Farkas' Pricing~\cite[p.~43]{Generic_Branch-Cut-and-Price} for initializing the RMP, and for fixing infeasibilities during the Branch-and-Price process. This technique uses Farkas' Lemma~\cite{Theorie_der_einfachen_Ungleichungen}, by finding a master variable that breaks the Lemma's statement and adding it to the RMP.
+
+\subsubsection{Choice of subproblem}
+
+  As the subproblems can be very difficult when solved exactly, we will use the results of the heuristic described in Section~\ref{sec:heuristics} to decide the order in which they should be solved. Subproblems with a more promising heuristic result will be solved first. After getting a negative-reduced cost column, we advance to the next iteration, in order to get more up-to-date dual values. As the master problem is not difficult, in contrast with the pricing problem, using the best possible dual values is preferred.  
 
 \subsubsection{Branching}
   Branching on fractional master variables is inefficient, and branching on the pricing variables is not possible, due to the aggregation of identical subproblems. 
@@ -267,15 +276,9 @@ As the pricing problem remains a MINLP, it is prohibitively expensive to solve i
 
   Mathematically, the left branch adds the constraint $\sum_{\lambda \mid x_\lambda = 1} \lambda \leq \left \lfloor{k}\right \rfloor$.
 
-\subsubsection{Initial columns generation}
-
-   We use Farkas' Pricing~\cite[p.~43]{Generic_Branch-Cut-and-Price} for initializing the RMP, and for fixing infeasibilities during the Branch-and-Price process. This technique uses Farkas' Lemma~\cite{Theorie_der_einfachen_Ungleichungen}, by finding a master variable that breaks the Lemma's statement and adding it to the RMP.
-
-\subsubsection{Choice of subproblem}
-
-  As the subproblems can be very difficult when solved exactly, we will use the results of the heuristic described in Section~\ref{sec:heuristics} to decide the order in which they should be solved. Subproblems with a more promissing heuristic result will be solved first. After getting a negative-reduced cost column, we advance to the next iteration, in order to get more up-to-date dual values. As the master problem is not difficult, in contrast with the pricing problem, using the best possible dual values is preferred.  
-
 \subsubsection{Parallelism}
+
+?????? I WILL MOST LIKELY NOT BE IMPLEMENTING THIS
 
 In decomposition approaches, solving the different subproblems in parallel can yield large speedups. While it is also possible to use parallelism to increase the speed of the compact formulation (see~\cite{Assessing_the_Effectiveness_of_(Parallel)_Branch-and-bound_Algorithms} for a review), this would take considerably more effort, both from a technical and a theoretical perspective. For this reason, it is our understanding that applying parallelism only to the decomposition approach is not unfair.
 
@@ -331,6 +334,7 @@ Below follows the production-fixing algorithm used in this work. ??? WORK IN PRO
       }
       $r^k_t \leftarrow f_{n,k}(r_{n,t-1}^k, y_{n,t}; r_{n,t-1}^1, \dots, r_{n,t-1}^{|\mathcal{K}_n|})$\;
       \If {$y_t > g_{k}(r^k_{t})$}{
+        $t \leftarrow \min(t, |\mathcal{T}| - \cmss{D}^k + 1)$\;
         \For{$t^\prime \in [t .. t + \cmss{D}^{k}]$}{
             $y_{t^\prime} \leftarrow 0$\;
             $x^{k}_{t^\prime} \leftarrow 1$\;
@@ -405,7 +409,7 @@ Below follows the production-fixing algorithm used in this work. ??? WORK IN PRO
 
 Starting with the description of the auxiliary procedure getProduction, we assume that the dual values follow a normal distribution with mean and standard deviation equal to the average and the standard deviation of the dual values, and calculate the cumulative probability of each. Dual values that are unexpectedly high will result in a higher production.
 
-Now moving onto the main procedure, PF, we start by calling getProduction to obtain the production vector, using the dual values given by the current iteration of the master problem. Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be incorrect), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $11-14$).
+Now moving onto the main procedure, PF, we start by calling getProduction to obtain the production vector, using the dual values given by the current iteration of the master problem. Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be incorrect), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). Line $14$ is necessary, since otherwise a component could have started maintenance that it would not be able to finish.  
 
 Due to Constraints~\ref{con:maintenance_implications}, we need to ensure that the maintenance implications are satisfied. We do this in Algorithm~\ref{algo:maintenanceDependencies}. Iterating over all components $k$, if we find a component $k^\prime$ such that $(k^\prime,k) \in \mathcal{Z}$ (and so $x^{k^\prime}_t \leq x^k_t$) which is not maintained, we schedule its maintenance. After doing this, we need to repeat the procedure, as the scheduling of $x^{k^\prime}_t$ might imply the maintenance of other components (if $\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{Z} \land x^{k^{\prime\prime}}_t = 0$). This is done until no more maintenance actions are added.
 
@@ -413,7 +417,7 @@ After scheduling these maintenance actions, we need to recompute the condition o
 
 A lot more work can go into this heuristic. The choice of the production vector in Algorithm~\ref{algo:getProduction} should be more substantiated, and the results mentioned in the beginning of the section regarding maintenance anticipation should also provide better results. 
 
-This heuristic also assumes the concavity of function $f$, as otherwise ?????. However, it is difficult to describe an example where this would not be the case, in the context of production-maintenance scheduling.
+This heuristic also assumes the concavity of function $f$, as otherwise ?????. However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
 
 
 \iffalse
@@ -433,6 +437,8 @@ If we have only one type of machine, diving the demand by the number of machines
 
 \subsection{Simplifications}
 
+MAYBE I'LL REMOVE THIS SUBSECTION
+
 This model may quickly become very large, depending on the number of periods being considered, but even for average-sized instances, it can be quite difficult to solve. 
 
 To cope with this, we assume that there are different time periods for production and maintenance decisions. For example, while production decisions are made every hour, maintenance might be planned on a biyearly basis. This forces minor modifications to the formulations, and some more significant ones, as the constraints that combine both $y$ and $x$ variables (like~\eqref{con:component_degradation}) need to use the proper indices.
@@ -446,11 +452,11 @@ Despite having a big impact on the tractability of the models, this simplificati
 
  In this section, we will detail the experimental setup that was used to validate the model, as well as the metrics used. All the code and experiment results can be found in~\cite{github-repo}.?????? STILL NEED TO PUSH
 
- The instances were randomly generated. They are divided by the number of time periods (either $10$, $20$, or $50$), by the number of machines, with some being identical, and they can have ``high'' or ``low'' complexity, meaning that the corresponding machines will have a higher or lower number of components, with more or less interaction between them, respectively. The complexity of the components also affects the amount of nonlinearity in the model. For each of these combinations, we generate $10$ different instances.
+ The instances were randomly generated. They are divided by the number of time periods (either $10$, $20$, or $50$), by the number of machines (with some being identical), and they can have ``high'' or ``low'' complexity, meaning that the corresponding machines will have a higher or lower number of components, with more or less interaction between them. The complexity of the components also affects the amount of nonlinearity in the model. For each of these combinations, we generate $10$ different instances.
 
- It is easy to create instances that favor each of the models, as having more identical machines favors the extended formulation. For this reason, we have opted for creating three sets of instances, with one of them having several identical machines, one other having many dissimilar machines, and an intermediate set.
+ It is easy to create instances that favor each of the models, as having more or less identical machines favors the extended or the compact formulations respectively. For this reason, we have opted for creating three sets of instances, with one of them having several identical machines, one other having many dissimilar machines, and an intermediate set.
  
- For every instance, we ran the three formulations with a $2$h time limit each. The tree formulations are the compact formulation, the extended formulation with exact pricing, and the extended formulation with heuristic pricing.
+ For every instance, we ran the three formulations with a $1$h time limit each. The three formulations are the compact formulation, the extended formulation with exact pricing, and the extended formulation with heuristic pricing.
 
 Each of the results represents the average of the $10$ randomly generated instances according to the relevant specification (all with the same complexity, time periods, number of machines). The Time column will show the average time to optimality, for the instances where optimality is achieved, and the Gap (\%) column will show the average Gap for the instances where it was not. The gap is the relative gap: $\frac{|\text{primal bound} - \text{dual bound}|}{ \min(|\text{primal bound}|, |\text{dual bound}|)}$.
 
@@ -574,7 +580,9 @@ WHAT TO VARY?
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-This article presented a MINLP for deciding how to best allocate production, subjected to a predetermined demand, with the objective of minimizing maintenance cost. Besides the compact model, we also developed a Dantzig-Wolfe reformulation, and additional heuristics due to the model's difficulty. %Even without the heuristic, we can optimally solve more instances (and those we can't, we achieve a much lower gap) than the ones originally achieved by us in~\cite{A_Mixed-Integer_Optimization_Model_for_Efficient_Power_Transformer_Maintenance_and_Operation}, hinting that the reformulations we implemented resulted in a better model. 
+SLIGHTLY OUTDATED
+
+This article presented a MINLP for a general production-maintenance scheduling problem. Besides the compact model, we also developed a Dantzig-Wolfe reformulation, and an additional heuristic due to the model's difficulty.
 
     The model is able to solve multiple medium-sized instances to optimality, but on larger instances, the difficulty grows rapidly. The heuristic has trouble reaching optimality but can obtain good solutions very quickly, and in larger instances, it even gets better results that the original model. These results leave us optimistic that we can decrease the granularity of small and medium-sized instances, and still obtain good solutions.% We based the data characterizing a power transformer on the information we could discover in the literature~\cite{cigre445}, due to the lack of quality real-world data available. 
    

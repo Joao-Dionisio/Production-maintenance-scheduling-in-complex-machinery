@@ -21,6 +21,12 @@ Muhamed Aganagic and Safoura Mokhtari.
 \newblock {\em IEEE Transactions on Power Systems}, 12, 02 1997.
 \newblock \href {https://doi.org/10.1109/59.574929} {\path{doi:10.1109/59.574929}}.
 
+\bibitem{Branch-and-price_for_a_class_of_nonconvex_mixed-integer_nonlinear_programs}
+Andrew Allman and Qi~Zhang.
+\newblock Branch-and-price for a class of nonconvex mixed-integer nonlinear programs.
+\newblock {\em Journal of Global Optimization}, 81(4):861–880, May 2021.
+\newblock URL: \url{http://dx.doi.org/10.1007/s10898-021-01027-w}, \href {https://doi.org/10.1007/s10898-021-01027-w} {\path{doi:10.1007/s10898-021-01027-w}}.
+
 \bibitem{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling}
 Thomas Bittar, Pierre Carpentier, Jean-Philippe Chancelier, and J{\'e}r{\^o}me Lonchampt.
 \newblock A decomposition method by interaction prediction for the optimization of maintenance scheduling.
@@ -107,11 +113,22 @@ Stephen~J. Maher, Ted~K. Ralphs, and Yuji Shinano.
 \newblock {\em CoRR}, abs/2104.10025, 2021.
 \newblock URL: \url{https://arxiv.org/abs/2104.10025}, \href {https://arxiv.org/abs/2104.10025} {\path{arXiv:2104.10025}}.
 
+\bibitem{Integrated_maintenance_planning_and_production_scheduling_with_Markovian_deteriorating_machine_conditions}
+Dragan~Banjevic Maliheh Aramon~Bajestani and J.~Christopher Beck.
+\newblock Integrated maintenance planning and production scheduling with markovian deteriorating machine conditions.
+\newblock {\em International Journal of Production Research}, 52(24):7377--7400, 2014.
+\newblock \href {https://doi.org/10.1080/00207543.2014.931609} {\path{doi:10.1080/00207543.2014.931609}}.
+
 \bibitem{Simultaneous_column-and-row_generation}
 {\.{I}}brahim Muter, {\c{S}}.~{\.{I}}lker Birbil, and Kerem B{\"u}lb{\"u}l.
 \newblock Simultaneous column-and-row generation for large-scale linear programs with column-dependent-rows.
 \newblock {\em Mathematical Programming}, 142(1):47--82, Dec 2013.
 \newblock \href {https://doi.org/10.1007/s10107-012-0561-8} {\path{doi:10.1007/s10107-012-0561-8}}.
+
+\bibitem{Selected_topics_on_integrated_production-scheduling_and_maintenance-planning_problems}
+Sven~Henrik Pries.
+\newblock {\em Selected topics on integrated production-scheduling and maintenance-planning problems}.
+\newblock PhD thesis, Staats-und Universit{\"a}tsbibliothek Hamburg Carl von Ossietzky, 2022.
 
 \bibitem{Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}
 Zhicheng Zhu, Yisha Xiang, and Bo~Zeng.
