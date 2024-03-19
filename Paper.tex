@@ -121,11 +121,11 @@ Long-term maintenance of machines with costly components has been studied throug
 
 In this article, we present a MINLP with the objective of minimizing the maintenance cost of machines composed of multiple components, that must satisfy a predetermined continuous demand of a product. We also present a Dantzig-Wolfe reformulation. Additionally, we develop heuristics to aid in the solving of these difficult models.
 
-\subsubsection{Production-maintenance scheduling} ?????? EXPAND ON THE BACKGROUND ????? This problem belongs to the class of production-maintenance scheduling problems with parallel machines - see Geurtsen et al.~\cite{Production_maintenance_and_resource_scheduling_A_review} for a comprehensive literature review. Many variants of this problem exist and have been studied for decades, albeit less than other more classical problems. The majority of the literature looks at linear variants of this problem (see~\cite{Scheduling_jobs_with_time_resource_tradeoff_via_nonlinear_programming} for a resource-production exception), mostly because physical considerations tend to be ignored in more abstract models. Other authors avoid the nonlinearities by modeling machine failure with a random distribution~\cite{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling, Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}, sometimes with Markov chains~\cite{Integrated_maintenance_planning_and_production_scheduling_with_Markovian_deteriorating_machine_conditions}. In these stochastic models, a few authors perform Bender's decomposition~\cite{Integrated_production_and_maintenance_scheduling_for_a_single_degrading_machine_with_deterioration-based_failures}.
+\subsubsection{Production-maintenance scheduling} ?????? EXPAND ON THE BACKGROUND ????? This problem belongs to the class of production-maintenance scheduling problems with parallel machines - see Geurtsen et al.~\cite{Production_maintenance_and_resource_scheduling_A_review} for a comprehensive literature review. Many variants of this problem exist and have been studied for decades, albeit less than other more classical problems. The majority of the literature looks at linear variants of this problem (see~\cite{Scheduling_jobs_with_time_resource_tradeoff_via_nonlinear_programming} for a resource-production exception), mostly because physical considerations tend to be ignored in more abstract models. Other authors avoid the nonlinearities by modeling machine failure with a random distribution~\cite{A_decomposition_method_by_interaction_prediction_for_the_optimization_of_maintenance_scheduling, Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}, sometimes with Markov chains~\cite{Integrated_maintenance_planning_and_production_scheduling_with_Markovian_deteriorating_machine_conditions, markovian_model_liang_2018}. In these stochastic models, a few authors perform Bender's decomposition~\cite{Integrated_production_and_maintenance_scheduling_for_a_single_degrading_machine_with_deterioration-based_failures, Selected_topics_on_integrated_production-scheduling_and_maintenance-planning_problems}.
 
-In $2022$, Pries defended a thesis~\cite{Selected_topics_on_integrated_production-scheduling_and_maintenance-planning_problems} which bears some similarity with this work, in a manner similar to ours. Insert name of guy here explored the possibility of using blablabla in his PhD thesis.
+In $2022$, Pries defended a thesis focusing on decomposition approaches for joint production-maintenance scheduling problems~\cite{Selected_topics_on_integrated_production-scheduling_and_maintenance-planning_problems}. It is the most similar work to this we could find, but it instead considers the machines as single structures, and that they are all identical. Furthermore, the nonlinearities we use to model the degradation, are instead replaced by random failures.
 
-It is also common to decouple the maintenance and the production decisions, to make the model more tractable~\cite{A_Two-Stage_Framework_for_Power_Transformer_Asset_Maintenance_Management—Part_I:_Models_and_Formulations}. Not performing these decisions at the same time allows the decision horizon for maintenance to be longer, but loses reliability as a result of the assumptions on the production. 
+It is also common to heuristically decouple the maintenance and the production decisions, to make the model more tractable~\cite{A_Two-Stage_Framework_for_Power_Transformer_Asset_Maintenance_Management—Part_I:_Models_and_Formulations}. Not performing these decisions at the same time allows the decision horizon for maintenance to be longer, but loses reliability as a result of the assumptions on production. 
 
 Our work differs from the ones we could find, since we are not assuming that our parallel machines are inseparable units, but rather consider them structures composed of interacting components, which can be independently maintained. Furthermore, even working with abstract machines, we admit the possibility of nonlinearities in the degradation of the components, which brings the models closer to reality, and increases their difficulty, as they are mixed-integer nonlinear programs.
 
@@ -134,12 +134,9 @@ Our work differs from the ones we could find, since we are not assuming that our
   
     Industrial maintenance tends to rely on two heuristics for maintenance scheduling: Time Based Maintenance (TbM), where maintenance is planned considering the time since the last maintenance action, and Condition Based Maintenance (CbM), where the asset is regularly tested and when some predefined threshold is reached, maintenance is scheduled (\hspace{1sp}\cite{cigre445} elaborates on this in the context of power transformers). 
     
-    Research on methods for employing just-in-time maintenance is plentiful, with many of these methods resorting to machine learning, with the use of real-world data~\cite{Artificial_Intelligence_Application_for_Just_in_Time_Maintenance}. The idea is to perform maintenance at the precise point in time when any delay in the maintenance action would result in the failure of a component. As will be shown in Example~\ref{ex:non_optimal_JIT_maintenance} from Section~\ref{sec:heuristics}, this can lead to suboptimal solutions.
+    Research on methods for employing just-in-time maintenance is plentiful, with many of these methods resorting to machine learning, with the use of real-world data~\cite{Artificial_Intelligence_Application_for_Just_in_Time_Maintenance}. The idea is to perform maintenance at the precise point in time when any delay in the maintenance action would result in the failure of a component. As will be shown in Example~\ref{ex:non_optimal_JIT_maintenance} from Section~\ref{sec:heuristics}, this can lead to suboptimal solutions. \\
 
-    To make things worse, these strategies are employed independently of the production decisions, thus further straying away from optimality, which highlights the importance of better maintenance practices. In the literature, some authors focus on optimizing the maintenance decisions, sometimes modeling degradation probabilistically~\cite{markovian_model_liang_2018}.\\
-
-
-  In terms of applications, this model can be used for minimizing maintenance costs of power transformer fleets, where the ``product'' is electricity, or in water treatment stations, where the ``product'' is clean water. More abstractly, it can also be understood as production-maintenance scheduling in factories working in parallel with different interacting machines. \\
+  In terms of applications, this model can be used for minimizing maintenance costs of power transformer fleets, where the ``product'' is electricity, or in water treatment stations, where the ``product'' is clean water. More abstractly, it can also be understood as production-maintenance scheduling in factories working in parallel with different interacting machines. In this last example, the factories take on the roll of the (pottentially different) machines, and the machines of the (pottentially interacting) components.\\
 
   This article is organized as follows: Section~\ref{sec:intro} frames the problem and provides a light background on production-maintenance problems and on maintenance practices, besides presenting the related work. In Section~\ref{sec:model}, the compact formulation is presented. Section~\ref{sec:DW} shows the Dantzig-Wolfe reformulation of this compact model, with implementation details appearing in Section~\ref{sec:implementation}. Due to the difficulty of this model we need some heuristics and consider some simplifications in Section~\ref{sec:heuristics}. Section~\ref{sec:tests} presents the experimental setup and in Section~\ref{sec:results} the results are shown and discussed. We conclude the paper in Section~\ref{sec:conclusion}. \\
 
@@ -357,7 +354,7 @@ Below follows the production-fixing algorithm used in this work. ??? WORK IN PRO
   result $\leftarrow \sum_{t \in \mathcal{T}}\sum_{k \in \mathcal{K}^n} x^k_t \cdot \cmss{C}^k$\; 
   
   \Return variables, result\;
-  \caption{PF-heuristic}
+  \caption{$\cmss{PF-heuristic}$}
   \label{algo:PF}
 \end{algorithm}
 
@@ -376,7 +373,7 @@ Below follows the production-fixing algorithm used in this work. ??? WORK IN PRO
     }
 
     \Return production\;
-  \caption{getProduction}
+  \caption{$\cmss{getProduction}$}
   \label{algo:getProduction}
 \end{algorithm}
 
@@ -402,22 +399,24 @@ Below follows the production-fixing algorithm used in this work. ??? WORK IN PRO
   }
 
   \Return $r,m,y$\;
-  \caption{maintenanceDependencies}
+  \caption{$\cmss{maintenanceDependencies}$}
   \label{algo:maintenanceDependencies}
 \end{algorithm}
 
 
-Starting with the description of the auxiliary procedure getProduction, we assume that the dual values follow a normal distribution with mean and standard deviation equal to the average and the standard deviation of the dual values, and calculate the cumulative probability of each. Dual values that are unexpectedly high will result in a higher production.
+Starting with the description of the auxiliary procedure $\cmss{getProduction}$, we assume that the dual values follow a normal distribution with mean and standard deviation equal to the average and the standard deviation of the dual values, and calculate the cumulative probability of each. Dual values that are unexpectedly high will result in a higher production.
 
-Now moving onto the main procedure, PF, we start by calling getProduction to obtain the production vector, using the dual values given by the current iteration of the master problem. Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be incorrect), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). Line $14$ is necessary, since otherwise a component could have started maintenance that it would not be able to finish.  
+Onto the main procedure, $\cmss{PF-heuristic}$, we start by calling $\cmss{getProduction}$ to obtain the production vector, using the dual values given by the current iteration of the master problem. Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be incorrect), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). Line $14$ is necessary, since otherwise a component could have started maintenance that it would not be able to finish.  
 
 Due to Constraints~\ref{con:maintenance_implications}, we need to ensure that the maintenance implications are satisfied. We do this in Algorithm~\ref{algo:maintenanceDependencies}. Iterating over all components $k$, if we find a component $k^\prime$ such that $(k^\prime,k) \in \mathcal{Z}$ (and so $x^{k^\prime}_t \leq x^k_t$) which is not maintained, we schedule its maintenance. After doing this, we need to repeat the procedure, as the scheduling of $x^{k^\prime}_t$ might imply the maintenance of other components (if $\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{Z} \land x^{k^{\prime\prime}}_t = 0$). This is done until no more maintenance actions are added.
 
-After scheduling these maintenance actions, we need to recompute the condition of the components that suffered damage from the production in this time period. Since the production was set to $0$ only when analyzing component $k$, the components that preceded it were incorrectly damaged.
+After scheduling these maintenance actions, we need to recompute the condition of the components that suffered production damage in this time period. Since the production was set to $0$ only when analyzing component $k$, the components that preceded it were incorrectly damaged. Line $17$ leads to the computation of the correct values.
+
+Some details were excluded to make the heuristic more readable. For example, if when reaching line $12$, $x^k_{t^\prime}$ had already been set to $1$, then we know that this heuristic cannot provide a feasible solution, since a component in optimal condition without any production will still require maintenance. This can be either because the other components have a big impact on the degradation, which this heuristic does not consider, or because the instance itself is not feasible.
 
 A lot more work can go into this heuristic. The choice of the production vector in Algorithm~\ref{algo:getProduction} should be more substantiated, and the results mentioned in the beginning of the section regarding maintenance anticipation should also provide better results. 
 
-This heuristic also assumes the concavity of function $f$, as otherwise ?????. However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
+This heuristic also assumes the concavity of function $f$, as otherwise not setting $r^k_t$ to its upper bound (which we do in line $9$ of Algorithm~\ref{algo:PF}) might yield a better solution. However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
 
 
 \iffalse
@@ -437,7 +436,7 @@ If we have only one type of machine, diving the demand by the number of machines
 
 \subsection{Simplifications}
 
-MAYBE I'LL REMOVE THIS SUBSECTION
+PROBABLY I'LL REMOVE THIS SUBSECTION
 
 This model may quickly become very large, depending on the number of periods being considered, but even for average-sized instances, it can be quite difficult to solve. 
 
