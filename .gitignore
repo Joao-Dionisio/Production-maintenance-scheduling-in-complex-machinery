@@ -1,7 +1,10 @@
-*.aux
-*.bbl
-*.blg
-*.log
-*.fls
-*.fdb_latexmk
-*.synctex.gz
+aux/*.aux
+aux/*.bbl
+aux/*.blg
+aux/*.log
+aux/*.fls
+aux/*.fdb_latexmk
+aux/*.synctex.gz
+aux/Paper.fdb_latexmk
+aux/Paper.log
+
