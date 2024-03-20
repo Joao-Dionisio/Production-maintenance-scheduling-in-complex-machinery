@@ -4,8 +4,8 @@ INPUT /usr/local/texlive/2023/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt
 INPUT /home/dionisio/Desktop/Doutoramento/Trabalho/LaTeX/Compact and DW-reformulation/Paper.tex
 OUTPUT aux/Paper.log
-INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/llncs/llncs.cls
-INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/llncs/llncs.cls
+INPUT ./llncs.cls
+INPUT llncs.cls
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/base/size10.clo

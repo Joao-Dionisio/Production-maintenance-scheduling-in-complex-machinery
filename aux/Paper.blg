@@ -9,50 +9,51 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: bibliography.bib
 Warning--I'm ignoring Theorie_der_einfachen_Ungleichungen's extra "title" field
---line 97 of file bibliography.bib
+--line 106 of file bibliography.bib
 Warning--to sort, need author, editor, or key in cigre445
 Warning--to sort, need editor, organization, or key in Artificial_Intelligence_Application_for_Just_in_Time_Maintenance
 Warning--empty author and editor in cigre445
 Warning--empty school in Generic_Branch-Cut-and-Price
-You've used 24 entries,
+Warning--empty booktitle in Combined_Maintenance_Scheduling_and_Production_Optimization
+You've used 25 entries,
             2943 wiz_defined-function locations,
-            840 strings with 13463 characters,
-and the built_in function-call counts, 12334 in all, are:
-= -- 1293
-> -- 549
-< -- 3
-+ -- 214
-- -- 177
-* -- 859
-:= -- 1787
-add.period$ -- 89
-call.type$ -- 24
-change.case$ -- 154
+            847 strings with 13769 characters,
+and the built_in function-call counts, 12975 in all, are:
+= -- 1359
+> -- 573
+< -- 4
++ -- 223
+- -- 185
+* -- 899
+:= -- 1870
+add.period$ -- 93
+call.type$ -- 25
+change.case$ -- 161
 chr.to.int$ -- 0
-cite$ -- 28
-duplicate$ -- 288
-empty$ -- 1061
-format.name$ -- 177
-if$ -- 3100
+cite$ -- 30
+duplicate$ -- 310
+empty$ -- 1117
+format.name$ -- 185
+if$ -- 3265
 int.to.chr$ -- 0
-int.to.str$ -- 24
-missing$ -- 18
-newline$ -- 138
-num.names$ -- 46
-pop$ -- 270
+int.to.str$ -- 25
+missing$ -- 19
+newline$ -- 144
+num.names$ -- 48
+pop$ -- 286
 preamble$ -- 1
-purify$ -- 134
+purify$ -- 140
 quote$ -- 0
-skip$ -- 777
+skip$ -- 818
 stack$ -- 0
-substring$ -- 502
-swap$ -- 84
-text.length$ -- 43
+substring$ -- 537
+swap$ -- 96
+text.length$ -- 46
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 93
-warning$ -- 4
-while$ -- 66
-width$ -- 26
-write$ -- 305
-(There were 5 warnings)
+type$ -- 97
+warning$ -- 5
+while$ -- 70
+width$ -- 27
+write$ -- 317
+(There were 6 warnings)

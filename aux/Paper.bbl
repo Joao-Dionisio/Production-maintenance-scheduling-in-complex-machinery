@@ -130,6 +130,12 @@ Sven~Henrik Pries.
 \newblock {\em Selected topics on integrated production-scheduling and maintenance-planning problems}.
 \newblock PhD thesis, Staats-und Universit{\"a}tsbibliothek Hamburg Carl von Ossietzky, 2022.
 
+\bibitem{Combined_Maintenance_Scheduling_and_Production_Optimization}
+Adriaen Verheyleweghen, Himanshu Srivastav, Anne Barros, and Johannes Jäschke.
+\newblock Combined maintenance scheduling and production optimization.
+\newblock pages 499--506, 01 2019.
+\newblock \href {https://doi.org/10.3850/978-981-11-2724-3_0253-cd} {\path{doi:10.3850/978-981-11-2724-3_0253-cd}}.
+
 \bibitem{Multi-component_Maintenance_Optimization:_A_Stochastic_Programming_Approach}
 Zhicheng Zhu, Yisha Xiang, and Bo~Zeng.
 \newblock Multi-component maintenance optimization: A stochastic programming approach, 2019.
