@@ -116,6 +116,8 @@ Long-term maintenance of machines with costly components has been studied throug
 %
 %
 %
+\todo[inline]{KB: to make git diffs more meaningful, it helps to write each sentence on its own line. You don't have to change everything now, but you can change this in the parts that you edit anyway.}
+\todo[inline]{KB: your use of commas is often excessive; it might come from a difference between punctuation rules in your language and English. I am removing some unneeded commas as I go, but this is something you might want to watch out for generally.}
 \label{sec:intro}
 \section{Introduction}
 
@@ -258,20 +260,26 @@ As the pricing problem remains a MINLP, it is prohibitively expensive to solve i
 \section{Extended formulation implementation}
 \label{sec:implementation}
 
+\todo[inline]{KB: you should be consistent about the capitalisation of the section titles (i.e. same level headings should have similar capitalisation).}
+\todo[inline]{KB: I would add some introductory text here.}
+
 \subsubsection{Initial columns generation}
 
-   We use Farkas' Pricing~\cite[p.~43]{Generic_Branch-Cut-and-Price} for initializing the RMP and for fixing infeasibilities during the Branch-and-Price process. This technique uses Farkas' Lemma~\cite{Theorie_der_einfachen_Ungleichungen}, by finding a master variable that breaks the Lemma's statement and adding it to the RMP.
+We use Farkas' Pricing~\cite[p.~43]{Generic_Branch-Cut-and-Price} for initializing the RMP and for fixing infeasibilities during the Branch-and-Price process.
+This technique uses Farkas' Lemma~\cite{Theorie_der_einfachen_Ungleichungen} by finding a master variable that breaks the lemma's statement and adding it to the RMP.
 
 \subsubsection{Choice of subproblem}
 
-  As the subproblems can be very difficult when solved exactly, we will use the results of the heuristic described in Section~\ref{sec:heuristics} to decide the order in which they should be solved. Subproblems with a more promising heuristic result will be solved first. After getting a negative-reduced cost column, we advance to the next iteration, in order to get more up-to-date dual values. As the master problem is not difficult, in contrast with the pricing problem, using the best possible dual values is preferred.  
+As the subproblems can be very difficult when solved exactly, we will use the results of the heuristic described in Section~\ref{sec:heuristics} to decide the order in which they should be solved. Subproblems with a more promising heuristic result will be solved first.
+After getting a column with a negative reduced cost, we advance to the next iteration in order to get more up-to-date dual values.
+As the master problem is not difficult, in contrast with the pricing problem, using the best possible dual values is preferable.
 
 \subsubsection{Branching}
-  Branching on fractional master variables is inefficient, and branching on the pricing variables is not possible, due to the aggregation of identical subproblems - two identical machines might pick different columns in the optimal solution. 
+  Branching on fractional master variables is inefficient, and branching on pricing variables is not possible due to the aggregation of identical subproblems - two identical machines might pick different columns in the optimal solution. 
 
   After solving an iteration of the RMP, we sum the columns to find a maintenance decision $x$ with a fractional value. Adding the master variables that perform this maintenance action, the branching decision is to enforce that these variables must not exceed $\left \lfloor{k}\right \rfloor$ on the left branch, or that they must at least sum to $\left \lceil{k}\right \rceil$ on the right branch, where $k$ is the (necessarily fractional) sum of these master variables.
 
-  Mathematically, the left branch adds the constraint $\sum_{\lambda \mid x_\lambda = 1} \lambda \leq \left \lfloor{k}\right \rfloor$.
+  Mathematically, the left branch adds the constraint $\sum_{\lambda \mid x_\lambda = 1} \lambda \leq \left \lfloor{k}\right \rfloor$.\todo{KB: make sure you define $x_\lambda$ somewhere}
 
 \subsubsection{Parallelism}
 
@@ -283,19 +291,27 @@ In decomposition approaches, solving the different subproblems in parallel can y
 \section{Heuristic \& Simplifications}
 \label{sec:heuristics}
 
-Realistic instances can quickly become intractable, due to the size of the problem, having many integer variables and potentially many nonlinear constraints.
+Realistic instances can quickly become intractable due to the size of the problem, having many integer variables and potentially many nonlinear constraints.
 
+\todo[inline]{KB: I find this paragraph to be too vague to be helpful to the reader. You could clarify/expand a bit.}
+For that reason, we developed a heuristic that tries to deal with this. It is applied to the column generation process, and remains applicable if it is used to initialize the RMP (in other words, when solving the Farkas iterations).
 
-For that reason, we developed a heuristic that tries to deal with this. It is applied to the column generation process, and remains applicable if it is used to initialize the RMP (in other words, when solving the Farkas iterations). \\
- An iterative refinement heuristic that would be applicable to this problem, can be found in~\cite{An_Optimization_Model_for_Power_Transformer_Maintenance}, whose idea is limiting the number of maintenance possibilities, and expanding them with every iteration. As this work was already published, and did not yield a large improvement, we omit it from this paper. 
+\todo[inline]{KB: put this right after the first sentence of the section, since this is background. The paper's contribution would better go next.} An iterative refinement heuristic that would be applicable to this problem can be found in~\cite{An_Optimization_Model_for_Power_Transformer_Maintenance}, whose idea is limiting the number of maintenance possibilities and expanding them with every iteration.
+As this work did not yield a large improvement, we omit it from this paper. 
 
-\subsubsection{PF} This production-fixing heuristic tries to take advantage of the impact that the production variable has on the model. Given a fixed production vector, the idea is to perform maintenance at the last possible moment, where if any maintenance action were to be delayed by one time period, the solution would be infeasible. This maintenance strategy is called just-in-time maintenance. For a fixed production vector, Constraints~\eqref{con:production_limit} will fix the condition of the components, sans the maintenance. Heuristically, the fixed production vector is chosen given the Farkas' duals or the actual duals of the current iteration. Assuming a normal distribution with mean and standard deviation provided by these duals, the production is going to be benefited the more unlikely high its dual is. %Heuristically, the decision of which values the variables should be fixed to is being done with pattern-search (also known as the Hooke-Jeeves method)~\cite{Direct_Search_Solution_of_Numerical_and_Statistical_Problems}, where each variable is independently increased and decreased, and improving moves are saved. The algorithm iterates over all the variables until either a time limit or a local optimum is reached. 
+\subsubsection{The production-fixing heuristic} This heuristic tries to take advantage of the impact of the production variable on the model.
+Given a fixed production vector, the idea is to perform maintenance at the last possible moment, where if any maintenance action were to be delayed by one time period, the solution would be infeasible.
+This maintenance strategy is referred to as just-in-time maintenance.
+For a fixed production vector, Constraints~\eqref{con:production_limit} will fix the condition of the components, sans the maintenance. Heuristically, the fixed production vector is chosen given the Farkas' duals or the actual duals of the current iteration. Assuming a normal distribution with mean and standard deviation provided by these duals, the production will benefit more the more unlikely high its dual is. %Heuristically, the decision of which values the variables should be fixed to is being done with pattern-search (also known as the Hooke-Jeeves method)~\cite{Direct_Search_Solution_of_Numerical_and_Statistical_Problems}, where each variable is independently increased and decreased, and improving moves are saved. The algorithm iterates over all the variables until either a time limit or a local optimum is reached. 
 
-However, even if we pick the best possible production vector, this heuristic is not optimal. This is due to the interaction between the components when it comes to their degradation, but also to the maintenance implication constraints (\eqref{con:maintenance_implications}). See the following example. 
+However, even if we select the best possible production vector, this heuristic is not optimal.
+This is due to the interaction between components when it comes to their degradation, but also to the maintenance implication constraints (\eqref{con:maintenance_implications}).
+See the following example:
 
 
 \begin{example}
-    Suppose that we are studying machines with two components, \cmss{A} and \cmss{B}, and that the maintenance of the \cmss{B} implies the maintenance of component \cmss{A}. Assume also that we have the best possible production for this heuristic. It may happen that component \cmss{A} is maintained in year $x$, and the \cmss{B} component (and consequently, \cmss{A}) in year $y > x$. However, it is possible that maintaining \cmss{B} in year $x$ also leads to a feasible solution, which would save us one maintenance of component \cmss{A}. For example, if the total number of periods is $y+1$, it is not unreasonable that both components could have been maintained at $x$ and still reached the end without failing. This anticipation of the maintenance gives a solution that is strictly better than the one we started with. 
+    Consider machines with two components, \cmss{A} and \cmss{B}, and suppose that the maintenance of the \cmss{B} implies the maintenance of component \cmss{A}.
+Assume also that we have the best possible production for this heuristic. It may happen that component \cmss{A} is maintained in year $x$, and component \cmss{B} (and consequently, \cmss{A}) in year $y > x$. However, it is possible that maintaining \cmss{B} in year $x$ also leads to a feasible solution, which would save us one maintenance of component \cmss{A}. For example, if the total number of periods is $y+1$, it is not unreasonable that both components could have been maintained at $x$ and still reached the end without failing. This anticipation of maintenance actions results in a solution that is strictly better than the one we started with. 
 
 \begin{figure}[H]
     \centering
@@ -303,6 +319,7 @@ However, even if we pick the best possible production vector, this heuristic is 
     \caption{Example of the greedy solution not being optimal}
     \label{fig:bad_greedy_solution}
 \end{figure}
+\todo[inline]{KB: I would expand the caption to briefly explain what in the figure stands for what.}
 
     Note that if the bottom solution is feasible, then it is guaranteed to be an optimal solution (for this fixed production vector). By construction, the original solution tells us that component \cmss{B} requires one maintenance action at $y$ at the latest, and component \cmss{A} also requires one at $x$ at the latest.
     
@@ -406,16 +423,22 @@ Below follows the production-fixing algorithm used in this work. ??? WORK IN PRO
 
 Starting with the description of the auxiliary procedure $\cmss{getProduction}$, we assume that the dual values follow a normal distribution with mean and standard deviation equal to the average and the standard deviation of the dual values, and calculate the cumulative probability of each. Dual values that are unexpectedly high will result in a higher production.
 
-Onto the main procedure, $\cmss{PF-heuristic}$, we start by calling $\cmss{getProduction}$ to obtain the production vector, using the dual values given by the current iteration of the master problem. Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be incorrect), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). Line $11$ is necessary, since otherwise a component could have started maintenance that it would not be able to finish.  
+Onto the main procedure, $\cmss{PF-heuristic}$, we start by calling $\cmss{getProduction}$ to obtain the production vector, using the dual values given by the current iteration of the master problem. Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be evaluated incorrectly), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). Line $11$ ensures that a component does not start maintenance that it would not be able to finish.  
 
-Due to Constraints~\ref{con:maintenance_implications}, we need to ensure that the maintenance implications are satisfied. We do this in Algorithm~\ref{algo:maintenanceDependencies}. Iterating over all components $k$, if we find a component $k^\prime$ such that $(k^\prime,k) \in \mathcal{Z}$ (and so $x^{k^\prime}_t \leq x^k_t$) which is not maintained, we schedule its maintenance. After doing this, we need to repeat the procedure, as the scheduling of $x^{k^\prime}_t$ might imply the maintenance of other components (if $\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{Z} \land x^{k^{\prime\prime}}_t = 0$). This is done until no more maintenance actions are added.
+Due to Constraints~\ref{con:maintenance_implications}, we need to ensure that the maintenance implications are satisfied.
+To this end, Algorithm~\ref{algo:maintenanceDependencies} iterates over all components $k$, and if it finds a component $k^\prime$ such that $(k^\prime,k) \in \mathcal{Z}$ (and so $x^{k^\prime}_t \leq x^k_t$) which is not maintained, it schedules its maintenance.
+Then it repeats the procedure, as the scheduling of $x^{k^\prime}_t$ might imply the maintenance of other components (if $\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{Z} \land x^{k^{\prime\prime}}_t = 0$).
+The algorithm terminates when no more maintenance actions are added.
 
-After scheduling these maintenance actions, we need to recompute the condition of the components that suffered production damage in this time period. Since the production was set to $0$ only when analyzing component $k$, the components that preceded it were incorrectly damaged. Line $17$ leads to the computation of the correct values.
+After scheduling these maintenance actions, we need to recompute the condition of the components that suffered production damage in this time period.
+Since the production was set to $0$ only when analyzing component $k$, the components that preceded it were incorrectly marked as damaged.
+Line $17$ computes the correct values.
 
 Some details were excluded to make the heuristic more readable. For example, if when reaching line $12$ $x^k_{t^\prime}$ had already been set to $1$, then we know that this heuristic cannot provide a feasible solution, since a component in optimal condition without any production will still require maintenance. This can be either because the other components have a big impact on the degradation, which this heuristic does not consider, or because the instance itself is not feasible. 
 
 A lot more work can go into this heuristic. The choice of the production vector in Algorithm~\ref{algo:getProduction} should be more substantiated, and the results mentioned in the beginning of the section regarding maintenance anticipation should also provide better results. 
 
+\todo[inline]{KB: this assumption is important, so I would move it closer to the beginning of the section. And may be mention whether the heuristic would still produce any meaningful results for the non-concave case.}
 This heuristic also assumes the concavity of function $f$, as otherwise not setting $r^k_t$ to its upper bound (which we do in line $9$ of Algorithm~\ref{algo:PF}) might yield a better solution. However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
 
 
@@ -436,6 +459,8 @@ If we have only one type of machine, diving the demand by the number of machines
 
 \subsection{Simplifications}
 
+\todo[inline]{KB: this is still what you are doing in the implementation, right? I would include this as a paragraph or two in the extended formulation implementation section, but I agree that this doesn't seem to be big enough for a separate subsection}
+
 PROBABLY I'LL REMOVE THIS SUBSECTION
 
 This model may quickly become very large, depending on the number of periods being considered, but even for average-sized instances, it can be quite difficult to solve. 
@@ -447,20 +472,27 @@ Despite having a big impact on the tractability of the models, this simplificati
 
 \section{Benchmark Instances Used}
 \label{sec:tests}
+\todo[inline]{KB: no need for a separate section to describe the instances. You can make one section for the computational experiments and include this as a subsection.}
 
 
  In this section, we will detail the experimental setup that was used to validate the model, as well as the metrics used. All the code and experiment results can be found in~\cite{github-repo}.?????? STILL NEED TO PUSH
 
- The instances were randomly generated. They are divided by the number of time periods (either $10$, $20$, or $50$), by the number of machines (with some being identical), and they can have ``high'' or ``low'' complexity, meaning that the corresponding machines will have a higher or lower number of components, with more or less interaction between them. The complexity of the components also affects the amount of nonlinearity in the model. For each of these combinations, we generate $10$ different instances.
+ The instances were randomly generated. They are divided by the number of time periods (either $10$, $20$, or $50$), by the number of machines (with some being identical), and they can have ``high'' or ``low'' complexity, meaning that the corresponding machines will have a higher or lower number of components with more or less interaction between them. The complexity of the components also affects the amount of nonlinearity in the model. For each of these combinations, we generate $10$ different instances.
 
- It is easy to create instances that favor each of the models, as having more or less identical machines favors the extended or the compact formulations respectively. For this reason, we have opted for creating three sets of instances, with one of them having several identical machines (one group of $20$), one other having many dissimilar machines ($4$ groups of $2$), and an intermediate set (one group of $5$ and one group of $2$). This means that our test set has $10\cdot 3\cdot 2\cdot 3 = 180$ different tests.
+ It is easy to create instances that favor each of the models, as having more or less identical machines favors the extended or the compact formulation respectively. For this reason, we have opted for creating three sets of instances, with one of them having several identical machines (one group of $20$ machines), one other having many dissimilar machines ($4$ groups of $2$), and an intermediate set (one group of $5$ and one group of $2$). %Thus our test set has $10\cdot 3\cdot 2\cdot 3 = 180$ different tests.
+
+\todo[inline]{KB: please double check that this is indeed what you meant: I rephrased the sentence}
+The varying combinations of time period numbers, complexity and numbers of machines and identical machines yield $10\cdot 3\cdot 2\cdot 3 = 180$ different instances.
  
- For every instance, we ran the three formulations with a $30$ minute time limit each. The three formulations are the compact formulation, the extended formulation with exact pricing, and the extended formulation with heuristic pricing.
+For every instance, we ran three formulations: the compact formulation, the extended formulation with exact pricing, and the extended formulation with heuristic pricing.\todo{KB: specify how these formulations are denoted in the tables}
 
-Each of the results present in Section~\ref{sec:results} represents the average of the $10$ randomly generated instances according to the relevant specification (all with the same complexity, time periods, number of machines). The Time column will show the average time to optimality, for the instances where optimality is achieved, and the Gap (\%) column will show the average Gap for the instances where it was not. The gap is the relative gap: $\frac{|\text{primal bound} - \text{dual bound}|}{ \min(|\text{primal bound}|, |\text{dual bound}|)}$.
+Each of the results in Section~\ref{sec:results} represents the average of the $10$ randomly generated instances according to the relevant specification (all with the same complexity, time periods, number of machines). The Time column will show the average time to optimality for the instances where optimality is achieved, and the Gap (\%) column will show the average gap for the instances where it was not.
+The gap is the relative gap: $\frac{|\text{primal bound} - \text{dual bound}|}{ \min(|\text{primal bound}|, |\text{dual bound}|)}$.
 
  
-The experiments were run on two 6-Core Intel Core i7 with 64 GB running at 3.20GHz. They ran the models with the SCIP solver, version 9.0.0~\cite{scip9.0}. For the implementation, we used its Python interface, PySCIPOpt~\cite{PySCIPOPT}, version 5.0. Some scripts (most importantly visualization with Matplotlib~\cite{matplotlib}) were implemented in Python version 3.11.4.
+The experiments were run on two 6-Core Intel Core i7 with 64 GB running at 3.20GHz with a 30 minute time limit.
+The models were solved with the SCIP solver, version 9.0.0~\cite{scip9.0}.
+For the implementation, we used SCIP's Python interface, PySCIPOpt~\cite{PySCIPOPT}, version 5.0. Some scripts (most importantly visualization with Matplotlib~\cite{matplotlib}) were implemented in Python version 3.11.4.
 
 
 \section{Results and Analysis}\label{sec:results}
@@ -543,7 +575,7 @@ WHAT TO VARY?
 \end{table}
 
 
-
+\todo[inline]{KB: don't you already have different complexities in the previous tables?}
 \begin{table}[!htb]
   \caption{Comparing effect of machine complexity}
 
