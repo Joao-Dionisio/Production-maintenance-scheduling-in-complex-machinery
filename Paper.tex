@@ -169,15 +169,16 @@ Our work differs from the ones we could find, since we are not assuming that our
 \section{Model}
 \label{sec:model}
 
+\todo[inline]{JD: I made the tables bigger. What do you think?}
+
 \begin{table}[!htb]
     %\caption{Global caption}
       \centering
       %\hspace{-2cm}
-          \resizebox{0.75\textwidth}{!}{
-\begin{tabular}{ |p{1.5cm}||p{5.3cm}|p{4cm}|  }
+          \resizebox{0.9\textwidth}{!}{
+\begin{tabular}{ |p{1.5cm}||p{6cm}|p{3cm}|  }
      \hline
      Parameter & Parameter Meaning & Parameter Range\\
-     \hline
      \hline
     $\cmss{C}^k$   &  Cost of maintaining component $k$   & $\mathbb{R}^{+}$\\
     $\cmss{D}^k$  & Duration of component $k$'s maintenance & $\mathbb{N}$\\
@@ -197,15 +198,15 @@ Our work differs from the ones we could find, since we are not assuming that our
     \label{tab:abstract_parameter_description}
 \end{table}
 
+\vspace*{-3em}
 
 \begin{table}[!htb]
       \centering
-          \resizebox{0.75\textwidth}{!}{
+          \resizebox{1\textwidth}{!}{
 
-\begin{tabular}{ |p{1.25cm}||p{6.5cm}|p{2.5cm}|  }
+\begin{tabular}{ |p{1.25cm}||p{8cm}|p{2.5cm}|  }
      \hline
      Variable & Variable Meaning & Variable Type\\
-     \hline
      \hline
     $x^k_{n,t}$   &  Maintenance of component $k$ of machine $n$ at period $t$   & Binary\\
     $y_{n,t}$   &  Production of machine $n$ at period $t$ & Continuous\\
@@ -306,7 +307,11 @@ As the pricing problem remains a MINLP, it is prohibitively expensive to solve i
 \label{sec:implementation}
 
 \todo[inline]{KB: you should be consistent about the capitalisation of the section titles (i.e. same level headings should have similar capitalisation). JD@KB:Done.}
-\todo[inline]{KB: I would add some introductory text here.}
+\todo[inline]{KB: I would add some introductory text here. JD@KB: Done.}
+
+Implementing Branch-and-Price requires a lot of effort.
+Fortunately SCIP~\cite{scip9.0}, the solver used in our work, is equipped with a Branch-and-Price framework.
+Nevertheless, there remains some problem-specific details which need to be implemented, described in this Section. 
 
 \subsubsection{Initial columns generation}
 
@@ -349,13 +354,15 @@ For this reason, it is our understanding that applying parallelism only to the d
 
 Realistic instances can quickly become intractable due to the size of the problem, having many integer variables and potentially many nonlinear constraints.
 
+\todo[inline]{KB: put this right after the first sentence of the section, since this is background. The paper's contribution would better go next. JD@KB: Done.} An iterative refinement heuristic that would be applicable to this problem can be found in a previous work of ours~\cite{An_Optimization_Model_for_Power_Transformer_Maintenance}, whose idea is limiting the number of maintenance possibilities and expanding them with every iteration.
+As this heuristic did not yield a large improvement, we omit it from this paper. 
+
+
 \todo[inline]{KB: I find this paragraph to be too vague to be helpful to the reader. You could clarify/expand a bit.}
 For that reason, we developed a heuristic that tries to deal with this. 
 It is applied to the column generation process, and remains applicable if it is used to initialize the RMP (in other words, when solving the Farkas iterations).
 
-\todo[inline]{KB: put this right after the first sentence of the section, since this is background. The paper's contribution would better go next.} An iterative refinement heuristic that would be applicable to this problem can be found in~\cite{An_Optimization_Model_for_Power_Transformer_Maintenance}, whose idea is limiting the number of maintenance possibilities and expanding them with every iteration.
-As this work did not yield a large improvement, we omit it from this paper. 
-
+\label{subsubsec:PF}
 \subsubsection{The production-fixing heuristic} This heuristic tries to take advantage of the impact of the production variable on the model.
 Given a fixed production vector, the idea is to perform maintenance at the last possible moment, where if any maintenance action were to be delayed by one time period, the solution would be infeasible.
 This maintenance strategy is referred to as just-in-time maintenance.
@@ -363,7 +370,17 @@ For a fixed production vector, Constraints~\eqref{con:production_limit} will fix
 Heuristically, the fixed production vector is chosen given the Farkas' duals or the actual duals of the current iteration. 
 Assuming a normal distribution with mean and standard deviation provided by these duals, the production will benefit more the more unlikely high its dual is. %Heuristically, the decision of which values the variables should be fixed to is being done with pattern-search (also known as the Hooke-Jeeves method)~\cite{Direct_Search_Solution_of_Numerical_and_Statistical_Problems}, where each variable is independently increased and decreased, and improving moves are saved. The algorithm iterates over all the variables until either a time limit or a local optimum is reached. 
 
-However, even if we select the best possible production vector, this heuristic is not optimal.
+
+\todo[inline]{KB: this assumption is important, so I would move it closer to the beginning of the section. 
+And maybe mention whether the heuristic would still produce any meaningful results for the non-concave case. JD@KB: Done} 
+This heuristic assumes the concavity of function $f$ for a fixed $y$.
+However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
+It seems sensible to assume that if a component's condition affects another's degradation, then the worse the condition of the former, the higher the impact on the latter.
+In the event of a nonconcave relationship, the heuristic will incorrectly mark more production vectors as unattainable, and will also provide worse solution the less concave the degradation.
+In this case the heuristic still works, but its benefit will be limited.
+
+
+However, even if function $f$ is concave for a fixed $y$, and we select the best possible production vector, this heuristic is not optimal.
 This is due to the interaction between components when it comes to their degradation, but also to the maintenance implication constraints (\eqref{con:maintenance_implications}).
 See the following example:
 
@@ -394,7 +411,7 @@ This anticipation of maintenance actions results in a solution that is strictly 
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Below follows the production-fixing algorithm used in this work. ??? WORK IN PROGRESS ???
+Below follows the production-fixing algorithm used in this work.
 
 
 \begin{algorithm}[H]%[H]
@@ -491,7 +508,8 @@ Starting with the description of the auxiliary procedure $\cmss{getProduction}$,
 Dual values that are unexpectedly high will result in a higher production.
 
 Onto the main procedure, $\cmss{PF-heuristic}$, we start by calling $\cmss{getProduction}$ to obtain the production vector, using the dual values given by the current iteration of the master problem. 
-Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be evaluated incorrectly), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance. 
+Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be evaluated incorrectly), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance.
+(And here is the assumption of concavity of $f$ for a fixed $y$, as otherwise setting the component's condition to a value lower than its upper bound might be better.) 
 If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. 
 This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). 
 Line $11$ ensures that a component does not start maintenance that it would not be able to finish.  
@@ -509,13 +527,8 @@ Some details were excluded to make the heuristic more readable.
 For example, if when reaching line $12$ $x^k_{t^\prime}$ had already been set to $1$, then we know that this heuristic cannot provide a feasible solution, since a component in optimal condition without any production will still require maintenance. 
 This can be either because the other components have a big impact on the degradation, which this heuristic does not consider, or because the instance itself is not feasible. 
 
-A lot more work can go into this heuristic. 
-The choice of the production vector in Algorithm~\ref{algo:getProduction} should be more substantiated, and the results mentioned in the beginning of the section regarding maintenance anticipation should also provide better results. 
-
-\todo[inline]{KB: this assumption is important, so I would move it closer to the beginning of the section. 
-And may be mention whether the heuristic would still produce any meaningful results for the non-concave case.}
-This heuristic also assumes the concavity of function $f$, as otherwise not setting $r^k_t$ to its upper bound (which we do in line $9$ of Algorithm~\ref{algo:PF}) might yield a better solution. 
-However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
+% more assertive?
+The choice of the production vector in Algorithm~\ref{algo:getProduction} can be more substantiated, and the results mentioned in the beginning of the section regarding maintenance anticipation should also provide better results, meaning that this heuristic can be improved upon. 
 
 
 % \iffalse
@@ -566,8 +579,8 @@ Despite having a big impact on the tractability of the models, this simplificati
  It is easy to create instances that favor each of the models, as having more or less identical machines favors the extended or the compact formulation respectively. 
  For this reason, we have opted for creating three sets of instances, with one of them having several identical machines (one group of $20$ machines), one other having many dissimilar machines ($4$ groups of $2$), and an intermediate set (one group of $5$ and one group of $2$). %Thus our test set has $10\cdot 3\cdot 2\cdot 3 = 180$ different tests.
 
-\todo[inline]{KB: please double check that this is indeed what you meant: I rephrased the sentence}
-The varying combinations of time period numbers, complexity and numbers of machines and identical machines yield $10\cdot 3\cdot 2\cdot 3 = 180$ different instances.
+\todo[inline]{KB: please double check that this is indeed what you meant: I rephrased the sentence. JD@KB: Done. Rephrased a bit as well.}
+The varying combinations of time periods, complexity and machine groups yield $10\cdot 3\cdot 2\cdot 3 = 180$ different instances.
  
 For every instance, we ran three formulations: the compact formulation, the extended formulation with exact pricing, and the extended formulation with heuristic pricing. 
 In the result subsection represented by ``Compact'', ``DW'', and ``DW+PF'' respectively.\todo{KB: specify how these formulations are denoted in the tables. JD@KB: Done.}
@@ -662,7 +675,7 @@ WHAT TO VARY?
 \end{table}
 
 
-\todo[inline]{KB: don't you already have different complexities in the previous tables?}
+\todo[inline]{KB: don't you already have different complexities in the previous tables? JD@KB: Yeah, I still need to think how I want to present the results...}
 \begin{table}[!htb]
   \caption{Comparing effect of machine complexity}
 
@@ -694,7 +707,7 @@ WHAT TO VARY?
   \end{minipage} 
 \end{table}
 
-As expected, the decomposition approaches appear advantageous, in comparison to the compact model, when increasing the number of identical machines. On the other hand, having more machines increases the number of pricing problems, and longer time-horizons increase their difficulty, so the compact formulation seems better suited for these instances.
+As expected, the decomposition approaches appear advantageous in comparison to the compact model when increasing the number of identical machines. On the other hand, having more machines increases the number of pricing problems, and longer time-horizons increase their difficulty, so the compact formulation seems better suited for these instances.
 
 An increase in machine complexity also increases the difficulty of the pricing problems....
 
@@ -704,15 +717,27 @@ An increase in machine complexity also increases the difficulty of the pricing p
 
 SLIGHTLY OUTDATED
 
-This article presented a MINLP for a general production-maintenance scheduling problem. Besides the compact model, we also developed a Dantzig-Wolfe reformulation, and an additional heuristic due to the model's difficulty.
+This article presented a MINLP for a general production-maintenance scheduling problem. 
+Besides the compact model, we also developed a Dantzig-Wolfe reformulation, and an additional heuristic due to the model's difficulty.
 
-    The model is able to solve multiple medium-sized instances to optimality, but on larger instances, the difficulty grows rapidly. The heuristic has trouble reaching optimality but can obtain good solutions very quickly, and in larger instances, it even gets better results that the original model. These results leave us optimistic that we can decrease the granularity of small and medium-sized instances, and still obtain good solutions.% We based the data characterizing a power transformer on the information we could discover in the literature~\cite{cigre445}, due to the lack of quality real-world data available. 
+    The model is able to solve multiple medium-sized instances to optimality, but on larger instances, the difficulty grows rapidly. 
+    The heuristic has trouble reaching optimality but can obtain good solutions very quickly, and in larger instances, it even gets better results that the original model. 
+    These results leave us optimistic that we can decrease the granularity of small and medium-sized instances, and still obtain good solutions.% We based the data characterizing a power transformer on the information we could discover in the literature~\cite{cigre445}, due to the lack of quality real-world data available. 
    
-     The Dantzig-Wolfe reformulation can still be improved, as the heuristic used to generate new columns does not fully utilize the duals provided by the master problem. Doing multiple iterations of the cheap pricing problem while adding benders-like optimality cuts, could be a better strategy for faster convergence. ??????
+    The heuristic proved to be a good complement to exact pricing.
+    Besides the comments at the end of the heuristic's description, we are considering taking better advantage of how fast the heuristic is.
+    Our idea is doing multiple iterations of the heuristic with different production vectors, while adding benders-like optimality and feasibility cuts, which should provide significantly better columns.
 
-  A different extended formulation shows promising results, by reducing the number of costly pricing rounds. The idea is to generate maintenance patterns and production patterns (patterns being a concrete assignment to the corresponding variables) in different pricing problems. The formulation we arrived at requires more theory than this one, as it requires the simultaneous generation of columns and rows. See~\cite{Simultaneous_column-and-row_generation} for more details on column-and-row generation.
+  A different extended formulation shows promising results, by reducing the number of costly pricing rounds. 
+  The idea is to generate maintenance patterns and production patterns (patterns being a concrete assignment to the corresponding variables) in different pricing problems. 
+  The formulation we arrived at requires more theory than this one, as it requires the simultaneous generation of columns and rows. 
+  See~\cite{Simultaneous_column-and-row_generation} for more details on column-and-row generation.
 
-  On the modeling side, more than one type of maintenance action can make the model more interesting. It increases its difficulty, but it also makes it more realistic, as complete replacement of a component is usually not the only option. The model can also become more general. For example, there might be non-critical components that may be maintained while still allowing for some production of the machine. Another example is the production upper bound in Constraints\eqref{con:production_limit}, which might depend not only on the condition of individual components, but also on the joint condition of multiple components.
+  On the modeling side, more than one type of maintenance action can make the model more interesting. 
+  It increases its difficulty, but it also makes it more realistic, as complete replacement of a component is usually not the only option. 
+  The model can also become more general. 
+  For example, there might be non-critical components that may be maintained while still allowing for some production of the machine.
+   Another example is the production upper bound in Constraints\eqref{con:production_limit}, which might depend not only on the condition of individual components, but also on the joint condition of multiple components.
 
   Finally, the application of these techniques in real-world scenarios is also desirable. 
 %    Bibliographies can be prepared with BibTeX using amsplain,
