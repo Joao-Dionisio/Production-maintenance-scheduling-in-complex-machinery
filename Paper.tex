@@ -169,32 +169,36 @@ Our work differs from the ones we could find, since we are not assuming that our
 \section{Model}
 \label{sec:model}
 
-\todo[inline]{JD: I made the tables bigger. What do you think?}
+\todo[inline]{JD: I made the tables bigger and added the decomposition parametrs/variables. What do you think?}
+
+In the tables below are the parameters and variables of the compact formulation (the top blocks) and of the extended formulation (the bottom blocks).
 
 \begin{table}[!htb]
     %\caption{Global caption}
       \centering
       %\hspace{-2cm}
-          \resizebox{0.9\textwidth}{!}{
-\begin{tabular}{ |p{1.5cm}||p{6cm}|p{3cm}|  }
+          \resizebox{1\textwidth}{!}{
+\begin{tabular}{ |p{1.5cm}||p{8cm}|p{3cm}|  }
      \hline
      Parameter & Parameter Meaning & Parameter Range\\
      \hline
     $\cmss{C}^k$   &  Cost of maintaining component $k$   & $\mathbb{R}^{+}$\\
     $\cmss{D}^k$  & Duration of component $k$'s maintenance & $\mathbb{N}$\\
     $\cmss{E}_t$   & Demand at period $t$ & $\mathbb{R}^{+}$\\
+    $\mathcal{I}$  & Set of maintenance implications & $\mathcal{K}^n \times \mathcal{K}^n$\\
     $\mathcal{K}$   &  Components to be maintained & \\
     \cmss{M} & Big constant to dominate constraint & $\mathbb{R}^{+}$\\
     $\mathcal{N}$ & Set of machines & $\mathbb{N}$\\
     $\cmss{Q}^k$   &  Maximum permissible production & $\mathbb{R}^{+}$\\
     $\cmss{R}^k$   &  Maximum condition of component $k$  & $\mathbb{R}^{+}$\\
     $\mathcal{T}$   &  Set of periods   & $\mathbb{N}$\\
-    $\mathcal{Z}$  & Set of maintenance implications & $\mathcal{K}^n \times \mathcal{K}^n$\\
-    
+    \hline
+    $\cmss{y}_{z,i,t}$ & Production of solution $i$ of subproblem $z$ at period $t$ & $\mathbb{R}^+$ \\
+    $\mathcal{Z}$  & Set of subproblems & $\mathbb{N}$ \\
     \hline
     \end{tabular}
     }
-      \caption{Description of the parameters used in the model}
+      \caption{Description of the parameters used in the models}
     \label{tab:abstract_parameter_description}
 \end{table}
 
@@ -208,39 +212,44 @@ Our work differs from the ones we could find, since we are not assuming that our
      \hline
      Variable & Variable Meaning & Variable Type\\
      \hline
+    $c$         & Objective value of solution & Discrete \\
+    $r^k_{n,t}$   &  Condition of component $k$ of machine $n$ at period $t$  & Continuous\\
     $x^k_{n,t}$   &  Maintenance of component $k$ of machine $n$ at period $t$   & Binary\\
     $y_{n,t}$   &  Production of machine $n$ at period $t$ & Continuous\\
-    $r^k_{n,t}$   &  Condition of component $k$ of machine $n$ at period $t$  & Continuous\\
+    \hline
+    $\lambda_{z,i}$ & How many solutions $i$ are picked from subproblem $z$ & Integer \\
+    $\pi_0$       & Dual variable associated to the convexity constraint & Continuous \\
+    $\pi_t$         & Dual variable associated to time period $t$ & Continuous \\
     \hline
     \end{tabular}
 }
-        \caption{Description of the variables used in the model}
+        \caption{Description of the variables used in the models}
         \label{tab:abstract_variable_description}    
 \end{table}
 
 Below we present a general formulation of the production-maintenance scheduling problem. 
-The variables are represented by lowercase letters ($x,y,r$), parameters by uppercase letters with a different font (\cmss{C}, \cmss{Q}, \cmss{M}, etc.), and sets by uppercase letters with a third font ($\mathcal{N}, \mathcal{K}, \mathcal{Z}$). 
+The variables are represented by lowercase letters ($x,y,r$), parameters by uppercase letters with a different font (\cmss{C}, \cmss{Q}, \cmss{M}, etc.), and sets by uppercase letters with a third font ($\mathcal{N}, \mathcal{K}, \mathcal{I}$). 
 Variables and parameters will have subscripts and superscripts. 
 For example, $r_{n,t}^k$ is the variable $r$ for component $k$ of machine $n$ at the time period $t$, and this nomenclature is standardized across the model.
 
 
 
 
-
 \begin{mini!}|l|[3]
-    {x,y}{\sum_{n \in \mathcal{N}}\sum_{t \in \mathcal{T}}\sum_{k \in \mathcal{K}^n} C^k \cdot x^k_{n,t}}
-{\label{con:cost_minimization_objective}}{}
-\addConstraint{\sum_{n \in \mathcal{N}} y_{n,t} \geq \cmss{E}_t \quad &\forall t \in \mathcal{T} \, \forall n \in \mathcal{N}}{\label{con:satisfy_demand}}
-\addConstraint{r_{n,t}^k \leq f_{n,k}(r_{n,t-1}^k, y_{n,t}; r_{n,t-1}^1, \dots, r_{n,t-1}^{|\mathcal{K}_n|}) + \cmss{M}\cdot x_{n,t}^k &\forall t,n,k}{\label{con:component_degradation}}
-\addConstraint{y_t \leq g_{n,k}(r_{n,t}^k) & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{\label{con:production_limit}}
-\addConstraint{y_{n,t} \leq (1-x^k_{n,t})\cdot \cmss{Q}^k \, & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{\label{con:maintenance_downtime}}
-\addConstraint{x^k_{n,i} \geq x^k_{n,t} - x^k_{n,t-1}\, & \forall n, k, t \leq i \leq t + \cmss{D}^k}{\label{con:maintenance_duration}}
-\addConstraint{x_{n,t}^k \leq x_{n,t}^{k^\prime} \, &\forall t \in \mathcal{T} \, \forall (k, k^\prime) \in \mathcal{Z}}{\label{con:maintenance_implications}}
-\addConstraint{x^k_{n,t} \in \{0,1\} \, &\forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{}
-\addConstraint{y_{n,t} \geq 0 \, &\forall t \, \forall n \in \mathcal{N}}{}
-\addConstraint{0 \leq r^k_{n,t} \leq \cmss{R}^k_n \, & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{}
-\label{model:abstract_formulation}
+  {x,y}{c := \sum_{n \in \mathcal{N}}\sum_{t \in \mathcal{T}}\sum_{k \in \mathcal{K}^n} C^k \cdot x^k_{n,t}}
+  {\label{con:cost_minimization_objective}}{}
+  \addConstraint{\sum_{n \in \mathcal{N}} y_{n,t} \geq \cmss{E}_t \quad &\forall t \in \mathcal{T} \, \forall n \in \mathcal{N}}{\label{con:satisfy_demand}}
+  \addConstraint{r_{n,t}^k \leq f_{n,k}(r_{n,t-1}^k, y_{n,t}; r_{n,t-1}^1, \dots, r_{n,t-1}^{|\mathcal{K}_n|}) + \cmss{M}\cdot x_{n,t}^k &\forall t,n,k}{\label{con:component_degradation}}
+  \addConstraint{y_t \leq g_{n,k}(r_{n,t}^k) & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{\label{con:production_limit}}
+  \addConstraint{y_{n,t} \leq (1-x^k_{n,t})\cdot \cmss{Q}^k \, & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{\label{con:maintenance_downtime}}
+  \addConstraint{x^k_{n,i} \geq x^k_{n,t} - x^k_{n,t-1}\, & \forall n, k, t \leq i \leq t + \cmss{D}^k}{\label{con:maintenance_duration}}
+  \addConstraint{x_{n,t}^k \leq x_{n,t}^{k^\prime} \, &\forall t \in \mathcal{T} \, \forall (k, k^\prime) \in \mathcal{I}}{\label{con:maintenance_implications}}
+  \addConstraint{x^k_{n,t} \in \{0,1\} \, &\forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{}
+  \addConstraint{y_{n,t} \geq 0 \, &\forall t \, \forall n \in \mathcal{N}}{}
+  \addConstraint{0 \leq r^k_{n,t} \leq \cmss{R}^k_n \, & \forall t \, \forall n \in \mathcal{N} \, \forall k \in \mathcal{K}}{}
+  \label{model:abstract_formulation}
 \end{mini!}
+\todo[inline]{JD@KB: Ambros prefers spelling out the sets ($\forall t \in \mathcal{T}$ instead of $\forall t$), but constraint ~\ref{con:component_degradation} is too big. What do you think?}
 
 %Where $f$ and $g$ are convex functions.
 
@@ -335,10 +344,9 @@ As the master problem is not difficult, in contrast with the pricing problem, us
 
 \subsubsection{Dual bound} ?????? WORK IN PROGRESS ?????
 The following is a dual bound for the master problem: ??? WHAT IS THE NAME? NEED REFERENCE ???
-$$z^\ast_{\text{RMP}} + \sum_{n \in \mathcal{N}}|\mathcal{N}_n\cdot min(0,z^\ast_{\text{PP}_n})| \leq z^\ast_{\text{MP}}$$
+$$c^\ast_{\text{RMP}} + \sum_{z \in \mathcal{Z}}|\mathcal{Z}_z|\cdot min(0,w_{\text{PP}_n}) \leq c^\ast_{\text{MP}}$$,
 
-As one of the approaches will not always solve the pricing problems to optimality, the optimal objective value of the pricing problem can
-be replaced by its dual bound, whenever available.
+where $c^\ast_{\text{RMP}}$ is the optimal objective of the restricted master problem, $c^\ast_{\text{MP}}$ is the optimal objective of the master problem, and $w$ is a valid dual bound for pricing problem $n$. 
 
 \subsubsection{Parallelism}
 
@@ -373,9 +381,10 @@ Assuming a normal distribution with mean and standard deviation provided by thes
 
 \todo[inline]{KB: this assumption is important, so I would move it closer to the beginning of the section. 
 And maybe mention whether the heuristic would still produce any meaningful results for the non-concave case. JD@KB: Done} 
-This heuristic assumes the concavity of function $f$ for a fixed $y$.
+This heuristic assumes the concavity of function $f$ for a fixed $y$, and the concavity of function $g$.
 However, we were unable to create a realistic example where this would not be the case, in the context of production-maintenance scheduling.
 It seems sensible to assume that if a component's condition affects another's degradation, then the worse the condition of the former, the higher the impact on the latter.
+In the same way, it also seems reasonable to assume that a more degraded component will not be able to withstand more production than if it were less degraded.
 In the event of a nonconcave relationship, the heuristic will incorrectly mark more production vectors as unattainable, and will also provide worse solution the less concave the degradation.
 In this case the heuristic still works, but its benefit will be limited.
 
@@ -486,7 +495,7 @@ Below follows the production-fixing algorithm used in this work.
   \Do{$\text{\upshape addedMaintenance = TRUE}$}{
     addedMaintenance $\leftarrow$ FALSE\;
     \For{$k^\prime \in \mathcal{K}^n$}{
-      \If{$\exists k^{\prime} \mid (k^\prime, k) \in \mathcal{Z} \land x^{k^{\prime}}_t < x^{k}_t$}{
+      \If{$\exists k^{\prime} \mid (k^\prime, k) \in \mathcal{I} \land x^{k^{\prime}}_t < x^{k}_t$}{
         addedMaintenance $\leftarrow$ TRUE\;
         \For{$t^\prime \in [t .. t + \cmss{D}^{k^\prime}]$}{
       $y_{t^\prime} \leftarrow 0$\;
@@ -510,13 +519,13 @@ Dual values that are unexpectedly high will result in a higher production.
 Onto the main procedure, $\cmss{PF-heuristic}$, we start by calling $\cmss{getProduction}$ to obtain the production vector, using the dual values given by the current iteration of the master problem. 
 Iterating first over the components and then over the time periods (otherwise the impact that the components have on each others' condition would be evaluated incorrectly), we compute the condition of the current component for the current time period, as every variable of Constraint~\ref{con:component_degradation} is fixed, sans maintenance.
 (And here is the assumption of concavity of $f$ for a fixed $y$, as otherwise setting the component's condition to a value lower than its upper bound might be better.) 
-If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}), then maintenance is scheduled. 
+If the resulting condition is incompatible with the production (see Constraint~\ref{con:production_limit}. Also, here is the assumption of the concavity of $g$), then maintenance is scheduled. 
 This means setting production to $0$, the condition to its optimal value, and the maintenance variables to $1$, for the duration of component $k$'s maintenance (lines $12-15$). 
 Line $11$ ensures that a component does not start maintenance that it would not be able to finish.  
 
 Due to Constraints~\ref{con:maintenance_implications}, we need to ensure that the maintenance implications are satisfied.
-To this end, Algorithm~\ref{algo:maintenanceDependencies} iterates over all components $k$, and if it finds a component $k^\prime$ such that $(k^\prime,k) \in \mathcal{Z}$ (and so $x^{k^\prime}_t \leq x^k_t$) which is not maintained, it schedules its maintenance.
-Then it repeats the procedure, as the scheduling of $x^{k^\prime}_t$ might imply the maintenance of other components (if $\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{Z} \land x^{k^{\prime\prime}}_t = 0$).
+To this end, Algorithm~\ref{algo:maintenanceDependencies} iterates over all components $k$, and if it finds a component $k^\prime$ such that $(k^\prime,k) \in \mathcal{I}$ (and so $x^{k^\prime}_t \leq x^k_t$) which is not maintained, it schedules its maintenance.
+Then it repeats the procedure, as the scheduling of $x^{k^\prime}_t$ might imply the maintenance of other components (if $\exists k^{\prime\prime} \mid (k^{\prime\prime}, k^\prime) \in \mathcal{I} \land x^{k^{\prime\prime}}_t = 0$).
 The algorithm terminates when no more maintenance actions are added.
 
 After scheduling these maintenance actions, we need to recompute the condition of the components that suffered production damage in this time period.
