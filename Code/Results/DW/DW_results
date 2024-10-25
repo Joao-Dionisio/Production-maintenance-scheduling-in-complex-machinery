@@ -1,0 +1,45 @@
+trivial
+Total optimal: 6
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 12
+Total gap: 0.00%
+Total n_cols: 408
+Total time: 19.46
+
+easy
+Total optimal: 0
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 2
+Total gap: 0.00%
+Total n_cols: 258
+Total time: 54.86
+
+medium
+Total optimal: 0
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 1
+Total gap: 0.00%
+Total n_cols: 342
+Total time: 81.31
+
+hard
+Total optimal: 0
+Total suboptimal: 0
+Total timeout: 12
+Total infeasible: 0
+Total gap: 1275.00%
+Total n_cols: 7212
+Total time: 3601.64
+
+impossible
+Total optimal: 0
+Total suboptimal: 0
+Total timeout: 7
+Total infeasible: 0
+Total gap: 0.00%
+Total n_cols: 2240
+Total time: 2101.36
+

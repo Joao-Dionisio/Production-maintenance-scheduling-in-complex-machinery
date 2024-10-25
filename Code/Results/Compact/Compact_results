@@ -1,0 +1,40 @@
+trivial
+Total optimal: 7
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 9
+Total gap: 0.00%
+Total time: 5.36
+
+easy
+Total optimal: 1
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 1
+Total gap: 0.00%
+Total time: 83.46
+
+medium
+Total optimal: 1
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 2
+Total gap: 0.00%
+Total time: 540.65
+
+hard
+Total optimal: 0
+Total suboptimal: 0
+Total timeout: 10
+Total infeasible: 0
+Total gap: 2538.70%
+Total time: 3000.01
+
+impossible
+Total optimal: 0
+Total suboptimal: 0
+Total timeout: 9
+Total infeasible: 0
+Total gap: 0.00%
+Total time: 2700.01
+

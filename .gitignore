@@ -7,3 +7,4 @@
 *.synctex.gz
 Paper.fdb_latexmk
 *.out
+*.pyc
