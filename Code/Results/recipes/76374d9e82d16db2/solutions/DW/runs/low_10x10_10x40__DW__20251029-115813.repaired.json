@@ -1,0 +1,1 @@
+{"meta": {"filename": "low_10x10_10x40", "kind": "repaired", "objective": "64.0"}, "master_vars": {"0": {"lambda[0,92]*": 2.0, "lambda[0,94]*": 3.0, "lambda[0,99]*": 4.0, "lambda[0,106]*": 1.0}, "1": {"lambda[1,52]*": 1.0, "lambda[1,71]*": 3.0, "lambda[1,72]*": 2.0, "lambda[1,73]*": 1.0, "lambda[1,81]*": 1.0, "lambda[1,88]*": 1.0, "lambda[1,121]*": 0.9999999999999999}}}

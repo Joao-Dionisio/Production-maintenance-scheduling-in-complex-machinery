@@ -1,0 +1,13 @@
+objective value:                                  348
+lambda[1,25]*                                       1 	(obj:0)
+lambda[1,33]*                                       1 	(obj:0)
+lambda[0,43]*                                       1 	(obj:0)
+lambda[0,46]*                                       1 	(obj:0)
+lambda[0,47]*                                       1 	(obj:22)
+lambda[1,52]*                                       4 	(obj:55)
+lambda[1,55]*                       0.999999999999999 	(obj:0)
+lambda[0,50]*                                       5 	(obj:0)
+lambda[1,58]*                                       1 	(obj:0)
+lambda[0,52]*                        1.99999999999991 	(obj:0)
+lambda[1,64]*                        1.00000000000001 	(obj:55)
+lambda[1,69]*                       0.999999999999991 	(obj:51)

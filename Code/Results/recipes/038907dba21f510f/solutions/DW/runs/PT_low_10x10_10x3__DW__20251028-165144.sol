@@ -1,0 +1,9 @@
+objective value:                                   18
+lambda[1,25]*                                       3 	(obj:0)
+lambda[1,29]*                                       4 	(obj:0)
+lambda[0,37]*                                       4 	(obj:0)
+lambda[1,36]*                                       3 	(obj:0)
+lambda[0,42]*                                       1 	(obj:18)
+lambda[0,43]*                                       2 	(obj:0)
+lambda[0,44]*                                       1 	(obj:0)
+lambda[0,47]*                                       2 	(obj:0)

@@ -1,6 +1,6 @@
-SCIP Status        : problem is solved [infeasible]
-Total Time         :       0.05
-  solving          :       0.05
+SCIP Status        : problem is solved [optimal solution found]
+Total Time         :       0.17
+  solving          :       0.17
   presolving       :       0.00 (included in solving)
   reading          :       0.00
   copying          :       0.00 (0 times copied the problem)
@@ -11,9 +11,9 @@ Original Problem   :
   Objective        : minimize, 0 non-zeros (abs.min = 1e+20, abs.max = -1e+20)
 Presolved Problem  :
   Problem name     : t_Master Problem
-  Variables        : 3 (0 binary, 2 integer, 0 implicit integer, 1 continuous)
+  Variables        : 27 (0 binary, 26 integer, 0 implicit integer, 1 continuous)
   Constraints      : 11 initial, 11 maximal
-  Objective        : minimize, 2 non-zeros (abs.min = 850.5, abs.max = 850.5)
+  Objective        : minimize, 19 non-zeros (abs.min = 56, abs.max = 252)
   Nonzeros         : 10 constraint, 0 clique table
 Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTypes  ChgBounds   AddHoles    DelCons    AddCons   ChgSides   ChgCoefs
   boundshift       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
@@ -43,12 +43,12 @@ Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTyp
   components       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
   root node        :          -          -      -          0          -          -          0          -          -          -          -          -
 Constraints        :     Number  MaxNumber  #Separate #Propagate    #EnfoLP    #EnfoRelax  #EnfoPS    #Check   #ResProp    Cutoffs    DomReds       Cuts    Applied      Conss   Children
-  benderslp        :          0          0          0          0          0          0          0          2          0          0          0          0          0          0          0
-  integral         :          0          0          0          0          0          0          0          2          0          0          0          0          0          0          0
+  benderslp        :          0          0          0          0          0          0          0          3          0          0          0          0          0          0          0
+  integral         :          0          0          0          0          0          0          0          3          0          0          0          0          0          0          0
   linear           :         11         11          0          0          0          0          0          2          0          0          0          0          0          0          0
-  benders          :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
-  fixedvar         :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
-  countsols        :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
+  benders          :          0          0          0          0          0          0          0          1          0          0          0          0          0          0          0
+  fixedvar         :          0          0          0          0          0          0          0          1          0          0          0          0          0          0          0
+  countsols        :          0          0          0          0          0          0          0          1          0          0          0          0          0          0          0
   components       :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
 Constraint Timings :  TotalTime  SetupTime   Separate  Propagate     EnfoLP     EnfoPS     EnfoRelax   Check    ResProp    SB-Prop
   benderslp        :       0.00       0.00       0.00       0.00       0.00       0.00       0.00       0.00       0.00       0.00
@@ -126,9 +126,10 @@ Cutselectors       :   ExecTime  SetupTime      Calls  RootCalls   Selected     
   dynamic          :       0.00       0.00          0          0          0          0          0          0          0          0
 Pricers            :   ExecTime  SetupTime      Calls       Vars
   problem variables:       0.00          -          0          0
-  Pricer for machin:       0.05       0.00          3          2
+  Pricer for machin:       0.16       0.00         23         26
 Branching Rules    :   ExecTime  SetupTime   BranchLP  BranchExt   BranchPS    Cutoffs    DomReds       Cuts      Conss   Children
   Pricing branching:       0.00       0.00          0          0          0          0          0          0          0          0
+  Pricing disaggreg:       0.00       0.00          0          0          0          0          0          0          0          0
   allfullstrong    :       0.00       0.00          0          0          0          0          0          0          0          0
   cloud            :       0.00       0.00          0          0          0          0          0          0          0          0
   distribution     :       0.00       0.00          0          0          0          0          0          0          0          0
@@ -197,7 +198,7 @@ Primal Heuristics  :   ExecTime  SetupTime      Calls      Found       Best
   scheduler        :       0.00       0.00          0          0          0
   shiftandpropagate:       0.00       0.00          0          0          0
   shifting         :       0.00       0.00          0          0          0
-  simplerounding   :       0.00       0.00          0          0          0
+  simplerounding   :       0.00       0.00          8          0          0
   subnlp           :       0.00       0.00          0          0          0
   trivial          :       0.00       0.00          2          0          0
   trivialnegation  :       0.00       0.00          0          0          0
@@ -221,8 +222,8 @@ LNS (Scheduler)    :      Calls  SetupTime  SolveTime SolveNodes       Sols     
   dins             :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
   trustregion      :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
 LP                 :       Time      Calls Iterations  Iter/call   Iter/sec  Time-0-It Calls-0-It    ItLimit
-  primal LP        :       0.00          0          0       0.00          -       0.00          0
-  dual LP          :       0.00          3          2       1.00          -       0.00          1
+  primal LP        :       0.00          7         20       2.86          -       0.00          0
+  dual LP          :       0.00         16         30       2.00          -       0.00          1
   lex dual LP      :       0.00          0          0       0.00          -
   barrier LP       :       0.00          0          0       0.00          -       0.00          0
   resolve instable :       0.00          0          0       0.00          -
@@ -252,14 +253,17 @@ Root Node          :
   First LP Iters   :          0
   First LP Time    :       0.00
   Final Dual Bound :          -
-  Final Root Iters :          2
+  Final Root Iters :         50
   Root LP Estimate :                     -
 Solution           :
-  Solutions found  :          0 (0 improvements)
-  Primal Bound     : infeasible
-  Dual Bound       :          -
+  Solutions found  :          1 (1 improvements)
+  First Solution   : +0.00000000000000e+00   (in run 1, after 1 nodes, 0.16 seconds, depth 0, found by <relaxation>)
+  Gap First Sol.   :       0.00 %
+  Gap Last Sol.    :       0.00 %
+  Primal Bound     : +0.00000000000000e+00   (in run 1, after 1 nodes, 0.16 seconds, depth 0, found by <relaxation>)
+  Dual Bound       : +0.00000000000000e+00
   Gap              :       0.00 %
 Integrals          :      Total       Avg%
-  primal-dual      :          -          - (problem infeasible)
-  primal-ref       :          -          - (problem infeasible)
-  dual-ref         :          -          - (problem infeasible)
+  primal-dual      :      16.50      99.73
+  primal-ref       :          -          - (not evaluated)
+  dual-ref         :          -          - (not evaluated)

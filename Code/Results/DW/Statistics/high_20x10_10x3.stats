@@ -1,6 +1,6 @@
 SCIP Status        : solving was interrupted [time limit reached]
-Total Time         :     300.62
-  solving          :     300.62
+Total Time         :     300.03
+  solving          :     300.03
   presolving       :       0.00 (included in solving)
   reading          :       0.00
   copying          :       0.00 (0 times copied the problem)
@@ -11,9 +11,9 @@ Original Problem   :
   Objective        : minimize, 0 non-zeros (abs.min = 1e+20, abs.max = -1e+20)
 Presolved Problem  :
   Problem name     : t_Master Problem
-  Variables        : 198 (0 binary, 197 integer, 0 implicit integer, 1 continuous)
+  Variables        : 618 (0 binary, 617 integer, 0 implicit integer, 1 continuous)
   Constraints      : 22 initial, 22 maximal
-  Objective        : minimize, 197 non-zeros (abs.min = 98.12, abs.max = 1746.48)
+  Objective        : minimize, 617 non-zeros (abs.min = 65, abs.max = 1311)
   Nonzeros         : 20 constraint, 0 clique table
 Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTypes  ChgBounds   AddHoles    DelCons    AddCons   ChgSides   ChgCoefs
   boundshift       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
@@ -126,9 +126,10 @@ Cutselectors       :   ExecTime  SetupTime      Calls  RootCalls   Selected     
   dynamic          :       0.00       0.00          0          0          0          0          0          0          0          0
 Pricers            :   ExecTime  SetupTime      Calls       Vars
   problem variables:       0.00          -          0          0
-  Pricer for machin:     300.62       0.00         44        197
+  Pricer for machin:     300.02       0.00         75        617
 Branching Rules    :   ExecTime  SetupTime   BranchLP  BranchExt   BranchPS    Cutoffs    DomReds       Cuts      Conss   Children
   Pricing branching:       0.00       0.00          0          0          0          0          0          0          0          0
+  Pricing disaggreg:       0.00       0.00          0          0          0          0          0          0          0          0
   allfullstrong    :       0.00       0.00          0          0          0          0          0          0          0          0
   cloud            :       0.00       0.00          0          0          0          0          0          0          0          0
   distribution     :       0.00       0.00          0          0          0          0          0          0          0          0
@@ -197,7 +198,7 @@ Primal Heuristics  :   ExecTime  SetupTime      Calls      Found       Best
   scheduler        :       0.00       0.00          0          0          0
   shiftandpropagate:       0.00       0.00          0          0          0
   shifting         :       0.00       0.00          0          0          0
-  simplerounding   :       0.00       0.00         20          0          0
+  simplerounding   :       0.00       0.00          5          0          0
   subnlp           :       0.00       0.00          0          0          0
   trivial          :       0.00       0.00          2          0          0
   trivialnegation  :       0.00       0.00          0          0          0
@@ -221,11 +222,11 @@ LNS (Scheduler)    :      Calls  SetupTime  SolveTime SolveNodes       Sols     
   dins             :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
   trustregion      :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
 LP                 :       Time      Calls Iterations  Iter/call   Iter/sec  Time-0-It Calls-0-It    ItLimit
-  primal LP        :       0.00         19        139       7.32          -       0.00          0
-  dual LP          :       0.00         26        121       4.84          -       0.00          1
+  primal LP        :       0.00          4         78      19.50          -       0.00          0
+  dual LP          :       0.01         71        886      12.84   86220.32       0.00          2
   lex dual LP      :       0.00          0          0       0.00          -
   barrier LP       :       0.00          0          0       0.00          -       0.00          0
-  resolve instable :       0.00          1          6       6.00          -
+  resolve instable :       0.00          0          0       0.00          -
   diving/probing LP:       0.00          0          0       0.00          -
   strong branching :       0.00          0          0       0.00          -          -          -          0
     (at root node) :          -          0          0       0.00          -
@@ -251,15 +252,15 @@ Root Node          :
   First LP value   :          -
   First LP Iters   :          0
   First LP Time    :       0.00
-  Final Dual Bound :          -
-  Final Root Iters :        260
+  Final Dual Bound : +1.25200000000000e+03
+  Final Root Iters :        964
   Root LP Estimate :                     -
 Solution           :
   Solutions found  :          0 (0 improvements)
   Primal Bound     :          -
-  Dual Bound       :          -
+  Dual Bound       : +1.25200000000000e+03
   Gap              :   infinite
 Integrals          :      Total       Avg%
-  primal-dual      :   30062.13     100.00
+  primal-dual      :   30003.39     100.00
   primal-ref       :          -          - (not evaluated)
   dual-ref         :          -          - (not evaluated)

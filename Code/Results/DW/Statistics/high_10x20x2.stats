@@ -1,6 +1,6 @@
 SCIP Status        : problem is solved [infeasible]
-Total Time         :       0.04
-  solving          :       0.04
+Total Time         :       1.92
+  solving          :       1.92
   presolving       :       0.00 (included in solving)
   reading          :       0.00
   copying          :       0.00 (0 times copied the problem)
@@ -11,9 +11,9 @@ Original Problem   :
   Objective        : minimize, 0 non-zeros (abs.min = 1e+20, abs.max = -1e+20)
 Presolved Problem  :
   Problem name     : t_Master Problem
-  Variables        : 3 (0 binary, 2 integer, 0 implicit integer, 1 continuous)
+  Variables        : 47 (0 binary, 46 integer, 0 implicit integer, 1 continuous)
   Constraints      : 11 initial, 11 maximal
-  Objective        : minimize, 2 non-zeros (abs.min = 322.29, abs.max = 322.29)
+  Objective        : minimize, 46 non-zeros (abs.min = 86, abs.max = 522)
   Nonzeros         : 10 constraint, 0 clique table
 Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTypes  ChgBounds   AddHoles    DelCons    AddCons   ChgSides   ChgCoefs
   boundshift       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
@@ -126,9 +126,10 @@ Cutselectors       :   ExecTime  SetupTime      Calls  RootCalls   Selected     
   dynamic          :       0.00       0.00          0          0          0          0          0          0          0          0
 Pricers            :   ExecTime  SetupTime      Calls       Vars
   problem variables:       0.00          -          0          0
-  Pricer for machin:       0.04       0.00          3          2
+  Pricer for machin:       1.91       0.00         34         46
 Branching Rules    :   ExecTime  SetupTime   BranchLP  BranchExt   BranchPS    Cutoffs    DomReds       Cuts      Conss   Children
   Pricing branching:       0.00       0.00          0          0          0          0          0          0          0          0
+  Pricing disaggreg:       0.00       0.00          0          0          0          0          0          0          0          0
   allfullstrong    :       0.00       0.00          0          0          0          0          0          0          0          0
   cloud            :       0.00       0.00          0          0          0          0          0          0          0          0
   distribution     :       0.00       0.00          0          0          0          0          0          0          0          0
@@ -222,7 +223,7 @@ LNS (Scheduler)    :      Calls  SetupTime  SolveTime SolveNodes       Sols     
   trustregion      :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
 LP                 :       Time      Calls Iterations  Iter/call   Iter/sec  Time-0-It Calls-0-It    ItLimit
   primal LP        :       0.00          0          0       0.00          -       0.00          0
-  dual LP          :       0.00          3          1       1.00          -       0.00          2
+  dual LP          :       0.00         34         59       2.27          -       0.00          8
   lex dual LP      :       0.00          0          0       0.00          -
   barrier LP       :       0.00          0          0       0.00          -       0.00          0
   resolve instable :       0.00          0          0       0.00          -
@@ -252,7 +253,7 @@ Root Node          :
   First LP Iters   :          0
   First LP Time    :       0.00
   Final Dual Bound :          -
-  Final Root Iters :          1
+  Final Root Iters :         59
   Root LP Estimate :                     -
 Solution           :
   Solutions found  :          0 (0 improvements)

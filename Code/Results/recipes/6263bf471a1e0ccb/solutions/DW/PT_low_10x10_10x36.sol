@@ -1,0 +1,13 @@
+objective value:                                  155
+lambda[0,48]*                                       3 	(obj:0)
+lambda[1,27]*                                       1 	(obj:0)
+lambda[1,52]*                                       2 	(obj:0)
+lambda[0,61]*                                       4 	(obj:0)
+lambda[1,94]*                                       2 	(obj:0)
+lambda[0,75]*                                       1 	(obj:0)
+lambda[1,114]*                                      1 	(obj:0)
+lambda[0,78]*                                       1 	(obj:0)
+lambda[0,79]*                                       1 	(obj:48)
+lambda[1,116]*                                      1 	(obj:0)
+lambda[1,123]*                                      2 	(obj:0)
+lambda[1,139]*                                      1 	(obj:107)

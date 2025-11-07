@@ -1,0 +1,13 @@
+objective value:                                  101
+lambda[1,40]*                                       7 	(obj:0)
+lambda[0,71]*                                       1 	(obj:0)
+lambda[0,72]*                                       1 	(obj:0)
+lambda[0,74]*                                       4 	(obj:0)
+lambda[1,47]*                                       1 	(obj:0)
+lambda[1,48]*                                       1 	(obj:0)
+lambda[0,80]*                     9.76846635802886e-08 	(obj:38)
+lambda[0,88]*                                       1 	(obj:0)
+lambda[1,51]*                                       1 	(obj:25)
+lambda[0,103]*                                      1 	(obj:38)
+lambda[0,105]*                      0.999999902315336 	(obj:38)
+lambda[0,122]*                                      1 	(obj:0)

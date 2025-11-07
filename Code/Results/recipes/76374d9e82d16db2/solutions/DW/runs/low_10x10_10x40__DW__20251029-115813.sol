@@ -1,0 +1,12 @@
+objective value:                                   64
+lambda[1,52]*                                       1 	(obj:8)
+lambda[1,71]*                                       3 	(obj:8)
+lambda[1,72]*                                       2 	(obj:8)
+lambda[1,73]*                                       1 	(obj:8)
+lambda[1,81]*                                       1 	(obj:0)
+lambda[0,92]*                                       2 	(obj:0)
+lambda[0,94]*                                       3 	(obj:0)
+lambda[1,88]*                                       1 	(obj:0)
+lambda[0,99]*                                       4 	(obj:0)
+lambda[1,121]*                                      1 	(obj:8)
+lambda[0,106]*                                      1 	(obj:0)

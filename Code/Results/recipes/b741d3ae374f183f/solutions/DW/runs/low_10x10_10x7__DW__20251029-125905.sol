@@ -1,0 +1,9 @@
+objective value:                                   10
+lambda[1,60]*                                       1 	(obj:0)
+lambda[1,64]*                                       1 	(obj:0)
+lambda[1,73]*                                       4 	(obj:0)
+lambda[1,75]*                                       2 	(obj:0)
+lambda[1,76]*                                       1 	(obj:5)
+lambda[0,48]*                                       3 	(obj:0)
+lambda[1,79]*                                       1 	(obj:5)
+lambda[0,49]*                                       7 	(obj:0)

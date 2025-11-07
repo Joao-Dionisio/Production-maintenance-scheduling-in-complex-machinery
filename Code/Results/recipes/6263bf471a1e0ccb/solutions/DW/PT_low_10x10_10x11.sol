@@ -1,0 +1,12 @@
+objective value:                                  402
+lambda[0,57]*                                       1 	(obj:0)
+lambda[1,43]*                                       1 	(obj:55)
+lambda[0,70]*                                       1 	(obj:0)
+lambda[0,71]*                                       1 	(obj:0)
+lambda[0,73]*                                       4 	(obj:0)
+lambda[0,83]*                                       2 	(obj:0)
+lambda[1,65]*                                       2 	(obj:55)
+lambda[1,66]*                                       1 	(obj:36)
+lambda[1,67]*                                       3 	(obj:12)
+lambda[1,70]*                                       3 	(obj:55)
+lambda[0,86]*                                       1 	(obj:0)

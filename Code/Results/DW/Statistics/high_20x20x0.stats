@@ -1,6 +1,6 @@
-SCIP Status        : problem is solved [infeasible]
-Total Time         :       0.11
-  solving          :       0.11
+SCIP Status        : solving was interrupted [time limit reached]
+Total Time         :     300.01
+  solving          :     300.01
   presolving       :       0.00 (included in solving)
   reading          :       0.00
   copying          :       0.00 (0 times copied the problem)
@@ -11,9 +11,9 @@ Original Problem   :
   Objective        : minimize, 0 non-zeros (abs.min = 1e+20, abs.max = -1e+20)
 Presolved Problem  :
   Problem name     : t_Master Problem
-  Variables        : 3 (0 binary, 2 integer, 0 implicit integer, 1 continuous)
+  Variables        : 1325 (0 binary, 1324 integer, 0 implicit integer, 1 continuous)
   Constraints      : 21 initial, 21 maximal
-  Objective        : minimize, 2 non-zeros (abs.min = 1177.75, abs.max = 1191.49)
+  Objective        : minimize, 1324 non-zeros (abs.min = 39, abs.max = 1210)
   Nonzeros         : 20 constraint, 0 clique table
 Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTypes  ChgBounds   AddHoles    DelCons    AddCons   ChgSides   ChgCoefs
   boundshift       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
@@ -126,9 +126,10 @@ Cutselectors       :   ExecTime  SetupTime      Calls  RootCalls   Selected     
   dynamic          :       0.00       0.00          0          0          0          0          0          0          0          0
 Pricers            :   ExecTime  SetupTime      Calls       Vars
   problem variables:       0.00          -          0          0
-  Pricer for machin:       0.11       0.00          3          2
+  Pricer for machin:     299.97       0.00        106       1324
 Branching Rules    :   ExecTime  SetupTime   BranchLP  BranchExt   BranchPS    Cutoffs    DomReds       Cuts      Conss   Children
   Pricing branching:       0.00       0.00          0          0          0          0          0          0          0          0
+  Pricing disaggreg:       0.00       0.00          0          0          0          0          0          0          0          0
   allfullstrong    :       0.00       0.00          0          0          0          0          0          0          0          0
   cloud            :       0.00       0.00          0          0          0          0          0          0          0          0
   distribution     :       0.00       0.00          0          0          0          0          0          0          0          0
@@ -197,7 +198,7 @@ Primal Heuristics  :   ExecTime  SetupTime      Calls      Found       Best
   scheduler        :       0.00       0.00          0          0          0
   shiftandpropagate:       0.00       0.00          0          0          0
   shifting         :       0.00       0.00          0          0          0
-  simplerounding   :       0.00       0.00          0          0          0
+  simplerounding   :       0.00       0.00         63          0          0
   subnlp           :       0.00       0.00          0          0          0
   trivial          :       0.00       0.00          2          0          0
   trivialnegation  :       0.00       0.00          0          0          0
@@ -221,8 +222,8 @@ LNS (Scheduler)    :      Calls  SetupTime  SolveTime SolveNodes       Sols     
   dins             :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
   trustregion      :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
 LP                 :       Time      Calls Iterations  Iter/call   Iter/sec  Time-0-It Calls-0-It    ItLimit
-  primal LP        :       0.00          0          0       0.00          -       0.00          0
-  dual LP          :       0.00          3          1       1.00          -       0.00          2
+  primal LP        :       0.02         62        676      10.90   33088.60       0.00          0
+  dual LP          :       0.00         44        132       3.30          -       0.00          4
   lex dual LP      :       0.00          0          0       0.00          -
   barrier LP       :       0.00          0          0       0.00          -       0.00          0
   resolve instable :       0.00          0          0       0.00          -
@@ -234,10 +235,10 @@ B&B Tree           :
   number of runs   :          1
   nodes            :          1 (0 internal, 1 leaves)
   feasible leaves  :          0
-  infeas. leaves   :          1
+  infeas. leaves   :          0
   objective leaves :          0
   nodes (total)    :          1 (0 internal, 1 leaves)
-  nodes left       :          0
+  nodes left       :          1
   max depth        :          0
   max depth (total):          0
   backtracks       :          0 (0.0%)
@@ -245,21 +246,21 @@ B&B Tree           :
   nodes exc. ref.  :          0 (0.0%)
   delayed cutoffs  :          0
   repropagations   :          0 (0 domain reductions, 0 cutoffs)
-  avg switch length:       2.00
+  avg switch length:       1.00
   switching time   :       0.00
 Root Node          :
   First LP value   :          -
   First LP Iters   :          0
   First LP Time    :       0.00
-  Final Dual Bound :          -
-  Final Root Iters :          1
+  Final Dual Bound : +5.81000000000000e+02
+  Final Root Iters :        808
   Root LP Estimate :                     -
 Solution           :
   Solutions found  :          0 (0 improvements)
-  Primal Bound     : infeasible
-  Dual Bound       :          -
-  Gap              :       0.00 %
+  Primal Bound     :          -
+  Dual Bound       : +5.81000000000000e+02
+  Gap              :   infinite
 Integrals          :      Total       Avg%
-  primal-dual      :          -          - (problem infeasible)
-  primal-ref       :          -          - (problem infeasible)
-  dual-ref         :          -          - (problem infeasible)
+  primal-dual      :   30000.86     100.00
+  primal-ref       :          -          - (not evaluated)
+  dual-ref         :          -          - (not evaluated)

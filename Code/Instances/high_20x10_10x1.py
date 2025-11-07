@@ -4,8 +4,8 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from testing import get_random_machine
 
 
-params = {'eps': 1e-09, 'decimal_places': 9, 'linear_relaxation': False, 'T_prime': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], 'time_limit': 7200, 'global_seed': 0.08414689154985155, 'demand': {1: 6.535, 2: 3.272, 3: 7.389, 4: 3.642, 5: 0.357, 6: 2.169, 7: 3.624, 8: 0.166, 9: 0.083, 10: 3.893, 11: 0.742, 12: 8.391, 13: 4.236, 14: 8.481, 15: 2.85, 16: 0.658, 17: 8.74, 18: 5.241, 19: 4.684, 20: 5.551}, 'machines_per_group': [10, 10], 'n_groups': 2, 'N': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'T': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]}
+params = {'eps': 1e-09, 'decimal_places': 9, 'linear_relaxation': False, 'T_prime': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], 'time_limit': 7200, 'global_seed': 0.11373092728079992, 'demand': {1: 10.86, 2: 13.31, 3: 10.21, 4: 12.07, 5: 11.26, 6: 12.2, 7: 11.13, 8: 12.3, 9: 11.66, 10: 12.17, 11: 13.0, 12: 11.94, 13: 10.47, 14: 10.21, 15: 13.15, 16: 11.63, 17: 10.65, 18: 13.15, 19: 11.93, 20: 12.43}, 'machines_per_group': [10, 10], 'n_groups': 2, 'N': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'T': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], 'production_granularity': 1.0, 'discrete_production': 0, 'dual_stabilization': False, 'redcost_fixing': True, 'debug_mode': True, 'stop_at_error': True, 'force_linear': False, 'ARMP_use_original_pricing': False, 'filename': 'high_20x10_10x1.py', 'PT': False}
 
-params[0] = get_random_machine(seed = 0.08414689154985155,complexity="high",params=params)
+params[0] = get_random_machine(seed = 0.11373092728079992,complexity="high",force_linear=False,params=params)
 
-params[1] = get_random_machine(seed = 1.0841468915498516,complexity="high",params=params)
+params[1] = get_random_machine(seed = 1.1137309272808,complexity="high",force_linear=False,params=params)

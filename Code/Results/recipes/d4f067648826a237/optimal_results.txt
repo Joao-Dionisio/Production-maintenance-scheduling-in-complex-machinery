@@ -1,0 +1,2 @@
+instance,is_infeasible,primal,dual,error
+low_10x20x4,No,80,96,OK

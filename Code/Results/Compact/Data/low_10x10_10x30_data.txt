@@ -1,0 +1,1 @@
+{"sols": [], "sols_time": [], "gap_at_sol": [], "found_best_sol_since_last_redcost_fixing": false}

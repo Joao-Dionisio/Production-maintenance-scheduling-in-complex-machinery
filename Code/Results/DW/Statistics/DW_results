@@ -1,0 +1,56 @@
+trivial
+Total optimal: 69
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 4
+Total gap: 0.00%
+Total nodes: 140
+Total n_cols: 3122
+Total n_heuristic_cols: 0
+Total time: 41.27
+
+easy
+Total optimal: 8
+Total suboptimal: 1
+Total timeout: 0
+Total infeasible: 42
+Total gap: 0.00%
+Total nodes: 48
+Total n_cols: 1235
+Total n_heuristic_cols: 0
+Total time: 495.16
+
+medium
+Total optimal: 16
+Total suboptimal: 6
+Total timeout: 0
+Total infeasible: 59
+Total gap: 115.90%
+Total nodes: 3579
+Total n_cols: 18227
+Total n_heuristic_cols: 0
+Total time: 7869.18
+
+hard
+Total optimal: 0
+Total suboptimal: 77
+Total timeout: 0
+Total infeasible: 0
+Total gap: 956.50%
+Total nodes: 3776
+Total n_cols: 62323
+Total n_heuristic_cols: 0
+Total time: 23105.08
+
+impossible
+Total optimal: 0
+Total suboptimal: 94
+Total timeout: 9
+Total infeasible: 9
+Total gap: 0.00%
+Total nodes: 253
+Total n_cols: 53535
+Total n_heuristic_cols: 0
+Total time: 30906.48
+Total dual: 0.00
+

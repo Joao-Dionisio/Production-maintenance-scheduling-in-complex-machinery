@@ -1,6 +1,6 @@
-SCIP Status        : problem is solved [infeasible]
-Total Time         :      31.13
-  solving          :      31.13
+SCIP Status        : solving was interrupted [time limit reached]
+Total Time         :     300.06
+  solving          :     300.06
   presolving       :       0.00 (included in solving)
   reading          :       0.00
   copying          :       0.00 (0 times copied the problem)
@@ -11,9 +11,9 @@ Original Problem   :
   Objective        : minimize, 0 non-zeros (abs.min = 1e+20, abs.max = -1e+20)
 Presolved Problem  :
   Problem name     : t_Master Problem
-  Variables        : 140 (0 binary, 139 integer, 0 implicit integer, 1 continuous)
-  Constraints      : 12 initial, 298 maximal
-  Objective        : minimize, 139 non-zeros (abs.min = 65.96, abs.max = 434.88)
+  Variables        : 282 (0 binary, 281 integer, 0 implicit integer, 1 continuous)
+  Constraints      : 12 initial, 12 maximal
+  Objective        : minimize, 281 non-zeros (abs.min = 90, abs.max = 486)
   Nonzeros         : 10 constraint, 0 clique table
 Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTypes  ChgBounds   AddHoles    DelCons    AddCons   ChgSides   ChgCoefs
   boundshift       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
@@ -41,14 +41,14 @@ Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTyp
   linear           :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
   benders          :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
   components       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
-  root node        :          -          -      -          0          -          -          2          -          -          -          -          -
+  root node        :          -          -      -          0          -          -          0          -          -          -          -          -
 Constraints        :     Number  MaxNumber  #Separate #Propagate    #EnfoLP    #EnfoRelax  #EnfoPS    #Check   #ResProp    Cutoffs    DomReds       Cuts    Applied      Conss   Children
-  benderslp        :          0          0          0          0          0          0        143          2          0          0          0          0          0          0          0
+  benderslp        :          0          0          0          0          0          0          0          2          0          0          0          0          0          0          0
   integral         :          0          0          0          0          0          0          0          2          0          0          0          0          0          0          0
-  linear           :         12+       298          0          0          0          0        143          2          0          0          0          0          0          0          0
-  benders          :          0          0          0          0          0          0        143          0          0          0          0          0          0          0          0
-  fixedvar         :          0          0          0          0          0          0        143          0          0          0          0          0          0          0          0
-  countsols        :          0          0          0          0          0          0        143          0          0          0          0          0          0          0          0
+  linear           :         12         12          0          0          0          0          0          2          0          0          0          0          0          0          0
+  benders          :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
+  fixedvar         :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
+  countsols        :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
   components       :          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
 Constraint Timings :  TotalTime  SetupTime   Separate  Propagate     EnfoLP     EnfoPS     EnfoRelax   Check    ResProp    SB-Prop
   benderslp        :       0.00       0.00       0.00       0.00       0.00       0.00       0.00       0.00       0.00       0.00
@@ -126,9 +126,10 @@ Cutselectors       :   ExecTime  SetupTime      Calls  RootCalls   Selected     
   dynamic          :       0.00       0.00          0          0          0          0          0          0          0          0
 Pricers            :   ExecTime  SetupTime      Calls       Vars
   problem variables:       0.00          -          0          0
-  Pricer for machin:      29.37       0.00         40        139
+  Pricer for machin:     300.06       0.00         24        281
 Branching Rules    :   ExecTime  SetupTime   BranchLP  BranchExt   BranchPS    Cutoffs    DomReds       Cuts      Conss   Children
-  Pricing branching:       0.03       0.00          0          0        143          0          0          0          0        286
+  Pricing branching:       0.00       0.00          0          0          0          0          0          0          0          0
+  Pricing disaggreg:       0.00       0.00          0          0          0          0          0          0          0          0
   allfullstrong    :       0.00       0.00          0          0          0          0          0          0          0          0
   cloud            :       0.00       0.00          0          0          0          0          0          0          0          0
   distribution     :       0.00       0.00          0          0          0          0          0          0          0          0
@@ -221,45 +222,45 @@ LNS (Scheduler)    :      Calls  SetupTime  SolveTime SolveNodes       Sols     
   dins             :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
   trustregion      :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
 LP                 :       Time      Calls Iterations  Iter/call   Iter/sec  Time-0-It Calls-0-It    ItLimit
-  primal LP        :       1.01        572      23632      41.31   23318.34       0.00          0
-  dual LP          :       0.69        769      14912      26.58   21550.50       0.00        208
+  primal LP        :       0.00          0          0       0.00          -       0.00          0
+  dual LP          :       0.00         24        136       6.18          -       0.00          2
   lex dual LP      :       0.00          0          0       0.00          -
   barrier LP       :       0.00          0          0       0.00          -       0.00          0
-  resolve instable :       1.70       1089      38220      35.10   22530.99
+  resolve instable :       0.00          0          0       0.00          -
   diving/probing LP:       0.00          0          0       0.00          -
   strong branching :       0.00          0          0       0.00          -          -          -          0
     (at root node) :          -          0          0       0.00          -
   conflict analysis:       0.00          0          0       0.00          -
 B&B Tree           :
   number of runs   :          1
-  nodes            :        287 (143 internal, 144 leaves)
+  nodes            :          1 (0 internal, 1 leaves)
   feasible leaves  :          0
-  infeas. leaves   :        144
+  infeas. leaves   :          0
   objective leaves :          0
-  nodes (total)    :        287 (143 internal, 144 leaves)
-  nodes left       :          0
-  max depth        :        143
-  max depth (total):        143
-  backtracks       :        142 (49.5%)
+  nodes (total)    :          1 (0 internal, 1 leaves)
+  nodes left       :          1
+  max depth        :          0
+  max depth (total):          0
+  backtracks       :          0 (0.0%)
   early backtracks :          0 (0.0%)
   nodes exc. ref.  :          0 (0.0%)
   delayed cutoffs  :          0
-  repropagations   :          2 (0 domain reductions, 0 cutoffs)
-  avg switch length:       7.11
+  repropagations   :          0 (0 domain reductions, 0 cutoffs)
+  avg switch length:       1.00
   switching time   :       0.00
 Root Node          :
   First LP value   :          -
   First LP Iters   :          0
   First LP Time    :       0.00
-  Final Dual Bound :          -
-  Final Root Iters :        225
+  Final Dual Bound : +0.00000000000000e+00
+  Final Root Iters :        136
   Root LP Estimate :                     -
 Solution           :
   Solutions found  :          0 (0 improvements)
-  Primal Bound     : infeasible
-  Dual Bound       :          -
-  Gap              :       0.00 %
+  Primal Bound     :          -
+  Dual Bound       : +0.00000000000000e+00
+  Gap              :   infinite
 Integrals          :      Total       Avg%
-  primal-dual      :          -          - (problem infeasible)
-  primal-ref       :          -          - (problem infeasible)
-  dual-ref         :          -          - (problem infeasible)
+  primal-dual      :   30006.00     100.00
+  primal-ref       :          -          - (not evaluated)
+  dual-ref         :          -          - (not evaluated)

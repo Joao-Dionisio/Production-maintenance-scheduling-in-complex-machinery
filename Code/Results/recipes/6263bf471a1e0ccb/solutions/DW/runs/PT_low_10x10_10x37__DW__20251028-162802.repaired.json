@@ -1,0 +1,1 @@
+{"meta": {"filename": "PT_low_10x10_10x37", "kind": "repaired", "objective": "48.0"}, "master_vars": {"0": {"lambda[0,40]*": 1.0, "lambda[0,49]*": 2.0, "lambda[0,50]*": 2.0, "lambda[0,53]*": 1.0, "lambda[0,54]*": 1.0, "lambda[0,55]*": 3.0}, "1": {"lambda[1,52]*": 1.0, "lambda[1,54]*": 4.0, "lambda[1,61]*": 1.0, "lambda[1,63]*": 1.0, "lambda[1,65]*": 1.0, "lambda[1,66]*": 2.0}}}

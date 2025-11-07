@@ -1,6 +1,6 @@
 SCIP Status        : problem is solved [infeasible]
-Total Time         :       0.89
-  solving          :       0.89
+Total Time         :     300.01
+  solving          :     300.01
   presolving       :       0.00 (included in solving)
   reading          :       0.00
   copying          :       0.00 (0 times copied the problem)
@@ -11,9 +11,9 @@ Original Problem   :
   Objective        : minimize, 0 non-zeros (abs.min = 1e+20, abs.max = -1e+20)
 Presolved Problem  :
   Problem name     : t_Master Problem
-  Variables        : 9 (0 binary, 8 integer, 0 implicit integer, 1 continuous)
+  Variables        : 607 (0 binary, 606 integer, 0 implicit integer, 1 continuous)
   Constraints      : 22 initial, 22 maximal
-  Objective        : minimize, 8 non-zeros (abs.min = 983.88, abs.max = 1602.08)
+  Objective        : minimize, 606 non-zeros (abs.min = 396, abs.max = 1444)
   Nonzeros         : 20 constraint, 0 clique table
 Presolvers         :   ExecTime  SetupTime  Calls  FixedVars   AggrVars   ChgTypes  ChgBounds   AddHoles    DelCons    AddCons   ChgSides   ChgCoefs
   boundshift       :       0.00       0.00      0          0          0          0          0          0          0          0          0          0
@@ -126,9 +126,10 @@ Cutselectors       :   ExecTime  SetupTime      Calls  RootCalls   Selected     
   dynamic          :       0.00       0.00          0          0          0          0          0          0          0          0
 Pricers            :   ExecTime  SetupTime      Calls       Vars
   problem variables:       0.00          -          0          0
-  Pricer for machin:       0.89       0.00          5          8
+  Pricer for machin:     299.96       0.00        109        606
 Branching Rules    :   ExecTime  SetupTime   BranchLP  BranchExt   BranchPS    Cutoffs    DomReds       Cuts      Conss   Children
   Pricing branching:       0.00       0.00          0          0          0          0          0          0          0          0
+  Pricing disaggreg:       0.00       0.00          0          0          0          0          0          0          0          0
   allfullstrong    :       0.00       0.00          0          0          0          0          0          0          0          0
   cloud            :       0.00       0.00          0          0          0          0          0          0          0          0
   distribution     :       0.00       0.00          0          0          0          0          0          0          0          0
@@ -222,10 +223,10 @@ LNS (Scheduler)    :      Calls  SetupTime  SolveTime SolveNodes       Sols     
   trustregion      :          0       0.00       0.00          0          0          0    0.00000    0.00000   -1.00000    1.00000      0.900    0    0    0    0    0    0    0    0
 LP                 :       Time      Calls Iterations  Iter/call   Iter/sec  Time-0-It Calls-0-It    ItLimit
   primal LP        :       0.00          0          0       0.00          -       0.00          0
-  dual LP          :       0.00          5          6       2.00          -       0.00          2
+  dual LP          :       0.05        119       1859      16.60   39396.44       0.00          7
   lex dual LP      :       0.00          0          0       0.00          -
   barrier LP       :       0.00          0          0       0.00          -       0.00          0
-  resolve instable :       0.00          0          0       0.00          -
+  resolve instable :       0.00          2        168      84.00          -
   diving/probing LP:       0.00          0          0       0.00          -
   strong branching :       0.00          0          0       0.00          -          -          -          0
     (at root node) :          -          0          0       0.00          -
@@ -252,7 +253,7 @@ Root Node          :
   First LP Iters   :          0
   First LP Time    :       0.00
   Final Dual Bound :          -
-  Final Root Iters :          6
+  Final Root Iters :       1859
   Root LP Estimate :                     -
 Solution           :
   Solutions found  :          0 (0 improvements)

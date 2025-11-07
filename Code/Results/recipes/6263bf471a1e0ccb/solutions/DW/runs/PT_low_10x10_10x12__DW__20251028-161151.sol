@@ -1,0 +1,12 @@
+objective value:                                  265
+lambda[1,28]*                                       1 	(obj:18)
+lambda[0,62]*                                       1 	(obj:31)
+lambda[0,70]*                                       2 	(obj:25)
+lambda[1,32]*                                       6 	(obj:0)
+lambda[0,88]*                                       1 	(obj:29)
+lambda[0,92]*                                       1 	(obj:27)
+lambda[1,37]*                                       3 	(obj:0)
+lambda[0,119]*                                      1 	(obj:8)
+lambda[0,120]*                                      1 	(obj:27)
+lambda[0,123]*                                      2 	(obj:25)
+lambda[0,127]*                                      1 	(obj:25)

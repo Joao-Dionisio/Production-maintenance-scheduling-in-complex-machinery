@@ -1,0 +1,2 @@
+instance,is_infeasible,primal,dual,error
+PT_low_10x10_10x5,No,inf,-inf,Yes

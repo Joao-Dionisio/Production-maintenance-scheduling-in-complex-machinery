@@ -1,0 +1,46 @@
+trivial
+Total optimal: 69
+Total suboptimal: 0
+Total timeout: 0
+Total infeasible: 4
+Total gap: 0.00%
+Total nodes: 726
+Total time: 18.91
+
+easy
+Total optimal: 9
+Total suboptimal: 28
+Total timeout: 0
+Total infeasible: 14
+Total gap: 0.00%
+Total nodes: 13623
+Total time: 9025.47
+
+medium
+Total optimal: 11
+Total suboptimal: 85
+Total timeout: 0
+Total infeasible: 0
+Total gap: 2285.20%
+Total nodes: 420681
+Total time: 26264.45
+
+hard
+Total optimal: 0
+Total suboptimal: 77
+Total timeout: 0
+Total infeasible: 0
+Total gap: 10111.30%
+Total nodes: 561421
+Total time: 23100.04
+
+impossible
+Total optimal: 0
+Total suboptimal: 103
+Total timeout: 0
+Total infeasible: 0
+Total gap: 0.00%
+Total nodes: 38302
+Total time: 30900.31
+Total dual: 0.00
+
