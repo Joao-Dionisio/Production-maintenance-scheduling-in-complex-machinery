@@ -1,7 +1,7 @@
-# Branch and price for nonlinear production-maintenance scheduling in complex machinery
+# Production-maintenance scheduling in complex machinery
 
 This repository contains the implementation of the *Branch and price for nonlinear production-maintenance scheduling in complex machinery* paper.
-The problem concerns deciding how much each machine should produce, so that demand is satisfied, given that more production incurs more degradation. This will require costly maintenance, and the problem's objective is the minimization of the maintenance cost.
+The problem concerns deciding how much each machine should produce to satisfy a given demand, with more production incurring additional component degradation. This will require costly maintenance, and the problem's objective minimizing the maintenance cost.
 
 The paper is saved in [Manuscript.pdf](https://github.com/Joao-Dionisio/Production-maintenance-scheduling-in-complex-machinery/blob/master/Manuscript.pdf).
 
