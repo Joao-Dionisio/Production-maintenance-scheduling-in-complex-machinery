@@ -1,7 +1,7 @@
 # Branch and price for nonlinear production-maintenance scheduling in complex machinery
 
-This repository contains the implementation in PySCIPOpt of the *Branch and price for nonlinear production-maintenance scheduling in complex machinery* paper.
-It should be adaptable to other Branch-and-Price applications, without much effort.
+This repository contains the implementation of the *Branch and price for nonlinear production-maintenance scheduling in complex machinery* paper.
+It should be adaptable to other Branch-and-Price applications without much effort.
 
 Note: This repository is still in the process of being cleaned up. Some files may contain code or comments that are not relevant to this specific project. Namely, mentions of alternative master problems and different formulations. Make sure that when running, either use `model=0` or `model=1` for the extended or the compact formulations, respectively.
 
