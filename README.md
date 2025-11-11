@@ -76,7 +76,8 @@ Contributions are welcome! Please follow these steps:
 - Submit a pull request with a detailed description.
 
 ### **6. License**
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the CC BY-NC 4.0 license for research and educational purposes.
+For commercial use, please contact the author, João Dionísio.
 
 ### **7. Contact**
 For questions or feedback, feel free to open an issue or contact me directly!
