@@ -2556,14 +2556,7 @@ if __name__ == "__main__":
     # Uncomment to run instance set with either DW (model=0) or Compact (model=1)
     # run_instance_set(model=0, heuristic=1, parallel=False, verbose=3, statistics=True, time_limit = time_limit, **kwargs)
     # run_instance_set(model=1, heuristic=1, parallel=False, verbose=5, statistics=True, time_limit = time_limit, **kwargs)
-    kwargs["filename"] = "low_10x10_10x7"
-    kwargs["model"] = 0
-    kwargs["heuristic"] = 1
-    kwargs["verbose"] = 3
-    kwargs["time_limit"] = 300
-    run_instance(**kwargs)
 
-    print("hello!")
     # uncomment to get stats from the run
     # generate_stats_report(linear=False, time_limit=time_limit) # groups instances by difficulty and 
     # retrieve_dw_timings()
