@@ -242,78 +242,6 @@ def integrality_check(model, pricer):
         # at the end must be zero
         assert model.isZero(new_mvar_val), "Integrality check failed."
 
-def ARMP_is_feasible(model, params):
-    pricer = model.data["pricer"]
-    model.writeProblem(trans=True)
-
-    if params["verbose"] >= 4:
-        for i,j in model.getVarDict(True).items():
-            if j > 0:
-                print(i,j)
-
-    # Checking convexity constraints
-    for subprob in range(len(params["machines_per_group"])):
-        subproblem_varsum = 0
-        for delta in pricer.data["Delta"][subprob].values():
-            subproblem_varsum += model.getVal(delta)
-        # We must ensure every machine is working. Idle machines may still need repairs
-        assert model.isLE(subproblem_varsum, params["machines_per_group"][subprob]), "Convexity"
-
-    # Checking demand constraints
-    T = params["T"]
-    sol_demand = len(T)*[0]
-    for subprob in range(len(params["machines_per_group"])):
-        for cur_Delta in pricer.data["Mu"][subprob]:
-            for mu in pricer.data["Mu"][subprob][cur_Delta].values():
-                cur_mu_val = model.getVal(mu)
-                if model.isGT(cur_mu_val, 0):
-                    cur_pattern = pricer.data["Mu_patterns"][subprob][cur_Delta][mu.name]
-                    for t in T:
-                        sol_demand[t-1] += cur_mu_val*cur_pattern["y[0,%i]" % t]
-
-    for t in T:
-        assert model.isGE(sol_demand[t-1]-params["demand"][t], -0.00001), "Demand. %.9f" % (sol_demand[t-1] - params["demand"][t])
-
-    if params["verbose"] >= 2:
-        print("Convexity feasible.")
-        print("Demand feasible.")
-        print("Checking column compatibility.")
-
-    assert ARMP_columns_are_compatible(model, params=params)
-
-    return True
-
-def ARMP_columns_are_compatible(model, params):
-    if model.getNSols() > 0:
-        # Checking compatibility constraints
-        for subprob in range(len(params["machines_per_group"])):
-            for cur_delta in model.data["pricer"].data["Delta"][subprob].values():
-                if model.getVal(cur_delta) > 0:
-                    pass#print(cur_delta.name, model.getVal(cur_delta))
-                cur_mu_count = 0
-                for cur_mu in model.data["pricer"].data["Mu"][subprob][cur_delta.name].values():
-                    cur_mu_count += model.getVal(cur_mu)
-                    if model.getVal(cur_mu) > 0:
-                        pass#print(cur_mu.name, model.getVal(cur_mu))
-                assert model.isLE(cur_mu_count, model.getVal(cur_delta))
-
-    incompatible = 0
-    total_cols = 0
-    for subprob in range(len(params["machines_per_group"])):
-        for cur_delta in model.data["pricer"].data["Delta"][subprob]:
-            for cur_mu in model.data["pricer"].data["Mu"][subprob][cur_delta]:
-                cur_mu_pattern    = model.data["pricer"].data["Mu_patterns"][subprob][cur_delta][cur_mu] 
-                cur_delta_pattern = model.data["pricer"].data["Delta_patterns"][subprob][cur_delta]
-
-                total_cols += 1
-                if not model.data["pricer"].ARMP_is_compatible(cur_mu_pattern, cur_delta_pattern, subprob=subprob):
-                    incompatible += 1
-    
-    if params["verbose"] >= 2:
-        print("Used %i/%i incompatible columns" % (incompatible, total_cols))
-
-    return True
-
 def _compute_recipe_id(seed: float | int | None = None, extra: dict | None = None) -> str:
     """Compute a collision-resistant fingerprint for the instance-generation "recipe".
 
@@ -1403,7 +1331,6 @@ def create_individual_instance(kwargs):
     params["debug_mode"]                     = kwargs["debug_mode"]
     params["stop_at_error"]                  = kwargs["stop_at_error"]
     params["force_linear"]                   = kwargs["force_linear"]
-    params["ARMP_use_original_pricing"]      = kwargs["ARMP_use_original_pricing"]
     return params
 
 # Testing
@@ -1427,7 +1354,6 @@ def run_instance(**kwargs):
     redcost_fixing                  = kwargs["redcost_fixing"]
     compact_run                     = kwargs["compact_run"]
     redirect_output                 = kwargs["redirect_output"]
-    parallel                        = kwargs["parallel"]
     verbose                         = kwargs["verbose"]
     debug_mode                      = kwargs["debug_mode"]
     stop_at_error                   = kwargs["stop_at_error"]
@@ -1435,7 +1361,6 @@ def run_instance(**kwargs):
     linear_relaxation               = kwargs["linear_relaxation"]
     time_limit                      = kwargs["time_limit"]
     n_workers                       = kwargs["n_workers"]
-    ARMP_use_original_pricing       = kwargs["ARMP_use_original_pricing"]
 
     # [webui] Optional callback to expose the model to the web GUI before optimize
     #         so the worker can interrupt solving (Stop button). If provided, it
@@ -1497,7 +1422,6 @@ def run_instance(**kwargs):
                     "prefix": prefix,
                     "PT": PT,
                     "n_workers": n_workers,
-                    "ARMP_use_original_pricing": ARMP_use_original_pricing
                     }
 
         params = create_instance_set(**kwargs)
@@ -1521,8 +1445,6 @@ def run_instance(**kwargs):
     params["time_limit"]                 = int(time_limit)
     params["reopt"]                      = reopt
     params["n_workers"]                  = n_workers
-    params["ARMP_use_original_pricing"]  = kwargs["ARMP_use_original_pricing"]
-
 
     stats = {}
     # Ensure heavy modules are loaded (lazy import fallback)
@@ -1720,23 +1642,6 @@ def run_instance(**kwargs):
 
         if params["verbose"] >= 2:
             m.data["pricer"].print_pricing_timings()
-
-    elif model == 2:
-        if m.getNSols() > 0:
-            try:
-                assert ARMP_is_feasible(model=m, params=params)
-            except AssertionError:
-                try:
-                    cur_recipe = _compute_recipe_id()
-                    default_results_file = os.path.join("./Results", "recipes", cur_recipe, "optimal_results.txt")
-                    method_tag = "DW_PF"
-                    save_infeasible_solution_debug(m, filename, results_file=default_results_file, recipe=cur_recipe, method_tag=method_tag)
-                finally:
-                    raise
-            if params["verbose"] >= 2:
-                m.data["pricer"].print_pricing_timings()
-        else:
-            pass # assert ARMP_columns_are_compatible(model=m, params=params)
     
     if plot and model != 1:
         plot_dual_values(m.data["pricer"], filename)
@@ -1825,7 +1730,6 @@ def run_instance_set(**kwargs):
                             "PT":                     kwargs["PT"],
                             "parallel":               kwargs["parallel"],
                             "n_workers":              kwargs["n_workers"],
-                            "ARMP_use_original_pricing": kwargs["ARMP_use_original_pricing"],
                             "plot":                   False,
                             "reopt":                  False,
                             }
@@ -2633,7 +2537,6 @@ if __name__ == "__main__":
                     "reopt": False,
                     "redirect_output": False,
                     "dual_stabilization": False,
-                    "ARMP_use_original_pricing": False,
                     "redcost_fixing": True,
                     "price_and_branch": True,
                     "feasibility": False,
@@ -2644,7 +2547,7 @@ if __name__ == "__main__":
                     "n_workers": os.cpu_count() // 2 if parallel else 1
                 }
 
-                create_instance_set(**kwargs)
+                # create_instance_set(**kwargs)
                 set_creation_seed += 1
 
     # run instance set and generate result files
@@ -2653,7 +2556,14 @@ if __name__ == "__main__":
     # Uncomment to run instance set with either DW (model=0) or Compact (model=1)
     # run_instance_set(model=0, heuristic=1, parallel=False, verbose=3, statistics=True, time_limit = time_limit, **kwargs)
     # run_instance_set(model=1, heuristic=1, parallel=False, verbose=5, statistics=True, time_limit = time_limit, **kwargs)
+    kwargs["filename"] = "low_10x10_10x7"
+    kwargs["model"] = 0
+    kwargs["heuristic"] = 1
+    kwargs["verbose"] = 3
+    kwargs["time_limit"] = 300
+    run_instance(**kwargs)
 
+    print("hello!")
     # uncomment to get stats from the run
     # generate_stats_report(linear=False, time_limit=time_limit) # groups instances by difficulty and 
     # retrieve_dw_timings()

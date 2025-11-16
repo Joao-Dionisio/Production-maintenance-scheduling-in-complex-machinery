@@ -1,6 +1,5 @@
 # pyright: reportPossiblyUnboundVariable=false
 from pyscipopt import Model, Pricer, SCIP_RESULT, SCIP_PARAMSETTING, SCIP_PARAMEMPHASIS, Variable, Constraint, quicksum
-from pyscipopt.recipes.getLocalConss import getLocalConss
 from parameters import *
 
 # Master
@@ -198,22 +197,6 @@ class CutPricer(Pricer):
                 for t, val in enumerate(dem):
                     print(f"  t={t:>3}: {fmt(val)}")
 
-            # Compatibility (ARMP)
-            comp = dualSolutions.get("compatibility_cons", {})
-            if isinstance(comp, dict) and comp:
-                print("\n[compatibility_cons]")
-                for sp, items in comp.items():
-                    if not items:
-                        continue
-                    print(f"  subprob {sp}:")
-                    # Show sorted by descending |value|
-                    try:
-                        sorted_items = sorted(items.items(), key=lambda kv: abs(kv[1]), reverse=True)
-                    except Exception:
-                        sorted_items = list(items.items())
-                    for k, v in sorted_items:
-                        print(f"    eta[{k}] = {fmt(v)}")
-
             # Branching
             br = dualSolutions.get("branching_cons", {})
             if isinstance(br, dict) and br:
@@ -271,8 +254,6 @@ class CutPricer(Pricer):
          # Determine pricing formulation based on model
         if self.data["model"] == 0:
             pricing_formulation = -1
-        elif self.data["model"] == 2:
-            pricing_formulation = 2
         else:
             raise ValueError("Invalid model")
 
@@ -542,12 +523,6 @@ class CutPricer(Pricer):
         self.ran_integer_rmp = False
         scip_dict = self.get_final_scip_dict(all_results)
 
-        if self.data["model"] == 2:
-            scip_dict["pricing_formulation"] = all_results.get(0, {}).get("pricing_formulation")
-
-            if scip_dict["pricing_formulation"] != 2:
-                scip_dict["lowerbound"] = 0 # todo: think about lowerbounds in the event of the other pricing problems.
-
         if self.ran_integer_rmp:
             integer_rmp_time = time() - integer_rmp_start
             self.data["integer_rmp_time"] += integer_rmp_time
@@ -612,19 +587,6 @@ class CutPricer(Pricer):
                     dualSolutions[con_type].append(self.model.getDualSolVal(c))
                     dualSolsWithNames[c.name] = dualSolutions[con_type][-1]
 
-        dualSolutions["compatibility_cons"] = {i:{} for i in range(self.data["params"]["n_groups"])}
-        for subprob in self.data["compatibility_cons"]: # ARMP only
-            if self.farkas:
-                for cur_delta in self.data["compatibility_cons"][subprob]:
-                    cur_cons = self.data["compatibility_cons"][subprob][cur_delta]
-                    dualSolutions["compatibility_cons"][subprob][cur_delta] = self.model.getDualfarkasLinear(cur_cons)
-                    dualSolsWithNames[cur_cons.name] = dualSolutions["compatibility_cons"][subprob][cur_delta]
-            else:
-                for cur_delta in self.data["compatibility_cons"][subprob]:
-                    cur_cons = self.data["compatibility_cons"][subprob][cur_delta]
-                    dualSolutions["compatibility_cons"][subprob][cur_delta] = self.model.getDualSolVal(cur_cons)
-                    dualSolsWithNames[cur_cons.name] = dualSolutions["compatibility_cons"][subprob][cur_delta]
-
         # getting branching dual values
         cur_node = self.model.getCurrentNode()
         cur_node_number = cur_node.getNumber()
@@ -684,11 +646,6 @@ class CutPricer(Pricer):
         given_delta = None # for initialization purposes
         if self.data["model"] == 0:
             pricing_formulation = -1
-        elif self.data["model"] == 2:
-            if self.farkas:
-                pricing_formulation = 2 # maybe don't need to do full pricing every time during farkas
-            else:
-                pricing_formulation = 0
         else:
             raise ValueError("Invalid model number")
 
@@ -710,8 +667,6 @@ class CutPricer(Pricer):
             for given_delta in self.data["Delta"][subprob]: 
                 if self.data["model"] == 0: # original
                     result = self.solve_pricing(subprob, reopt=self.data["params"]["reopt"], heuristic=2, pricing_formulation=-1, dualSolutions=dualSolutions, given_delta=None, given_mu=None)
-                elif self.data["model"] == 2: # alternative
-                    result = self.solve_pricing(dualSolutions=dualSolutions, reopt=self.data["params"]["reopt"], subprob=subprob, pricing_formulation=pricing_formulation, heuristic=1, given_delta=given_delta, given_mu=None)
                 else:
                     raise ValueError("Invalid model number")
 
@@ -1153,38 +1108,16 @@ class CutPricer(Pricer):
         pricing_formulation        = result["pricing_formulation"]
         maintenance_cost           = result["maintenance_cost"]
 
-        if pricing_formulation == 1:
-            old_delta          = result["old_delta"] # need this because we want to remove mu from this old delta
-            converted_mus      = result["converted_mus"] # need this because we want to access the variables that will be transfered to the new delta
-
         self.data["previous_redcosts"][subprob].append(objval[0])
-
-        if pricing_formulation == 0:
-            given_delta        = result["given_delta"]
-        else:
-            given_delta        = {i: None for i in range(len(objval))}
-
-        if pricing_formulation == 0:
-            assert mu_patterns
-            assert given_delta[0] != None, "PP 0 needs to be given a discrete pattern!"
+        given_delta        = {i: None for i in range(len(objval))}
 
         have_new_col = False
         # for each solution found in subproblem
         for i in range(len(objval)):
-            if pricing_formulation == -1:
-                decision_vars = vars[i]
-                cur_mu = None
-                cur_delta = None
-                # actual_decision_vars = {var: val for var, val in vars[i].items() if var.startswith('y') or var.startswith("m")}
-            else:
-                cur_mu = None
-                cur_delta = None
-                if pricing_formulation == 0:
-                    cur_mu = mu_patterns[i]
-                elif pricing_formulation == 1:
-                    cur_delta = delta_patterns[i]
-
-                decision_vars = {}
+            decision_vars = vars[i]
+            cur_mu = None
+            cur_delta = None
+            # actual_decision_vars = {var: val for var, val in vars[i].items() if var.startswith('y') or var.startswith("m")}
 
             if self.data["params"]["debug_mode"] and pricing_formulation != 1:
                 # Checking if reduced cost is negative. If column was already visited, discard it. # debug why are identical columns regenerated?
@@ -1196,37 +1129,6 @@ class CutPricer(Pricer):
                         pattern_key = ''.join(str(decision_vars))
                         var_name = self.data["pattern_encoding"][subprob][pattern_key]
                         existing_var = self.data["var"][subprob][var_name]
-                        target_ub = self.data["params"]["machines_per_group"][subprob]
-
-                    elif pricing_formulation == 0:
-                        mu_var = None
-                        for mu_name, mu_pat in self.data["Mu_patterns"][subprob][given_delta[i]].items():
-                            if mu_pat == cur_mu:
-                                mu_var = self.data["Mu"][subprob][given_delta[i]][mu_name]
-                                break
-                        assert mu_var is not None, "Could not locate existing mu pattern."
-                        delta_var = self.data["Delta"][subprob][given_delta[i]]
-                        existing_var = mu_var
-                        target_ub = delta_var.getUbLocal()
-
-                    elif pricing_formulation in (2,):
-                        # Could be delta or mu; first try delta by hashed key
-                        existing_var = None
-                        if cur_delta:
-                            delta_key = self._ARMP_get_delta_key_for_hashing(subprob=subprob,
-                                                                        delta_pattern=cur_delta)
-                            if delta_key in self.data["delta_encoding"][subprob]:
-                                existing_delta_name = self.data["delta_encoding"][subprob][delta_key][0]
-                                existing_var = self.data["Delta"][subprob][existing_delta_name]
-                        if existing_var is None and cur_mu:
-                            # fallback to mu pattern exact match
-                            for dname in self.data["Mu_patterns"][subprob]:
-                                for mu_name, mu_pat in self.data["Mu_patterns"][subprob][dname].items():
-                                    if mu_pat == cur_mu:
-                                        existing_var = self.data["Mu"][subprob][dname][mu_name]
-                                        break
-                                if existing_var: break
-                        assert existing_var is not None, "Existing pattern (formulation 2) not found."
                         target_ub = self.data["params"]["machines_per_group"][subprob]
                     else:
                         raise ValueError("Unexpected pricing formulation for duplicate handling.")
@@ -1280,85 +1182,14 @@ class CutPricer(Pricer):
                 # Adding mu variable
                 current_delta_index = self.n_delta # modified when adding delta. needs to be here for managing mu's
 
-                if pricing_formulation in [0,2]:
-                    if current_delta_index == -1:
-                        assert self.farkas
-                        given_delta_index = 0
-
-                    if given_delta[i] == None:
-                        assert pricing_formulation == 2
-                        given_delta_index = current_delta_index
-                    else:
-                        given_delta_index = int(given_delta[i].split(",")[1][:-2])
-
-                    current_mu_index = self.n_mu
-                    if "mu_name" in result:
-                        mu_name = "transfer_" + result["mu_name"]
-                    else:
-                        mu_name = "mu[%i,%i,%s]*" % (subprob, given_delta_index, current_mu_index)
-
-                    new_mu = self.model.addVar(mu_name, vtype="C", lb = 0, obj=0, pricedVar=True, deletable=True)
-                    self.n_mu += 1
-                    # del_mu = self.model.addVar(name="del_mu[%i,%i,%s]*" % (subprob, given_delta_index, current_mu_index), vtype="C",
-                                            # lb = 0, obj=0, pricedVar=True)
-                    # self.model.addCons(del_mu == new_mu, name="del_cons_mu[%i,%i,%s]*" % (subprob, given_delta_index, current_mu_index))
-
-                    # new_mu.data = {'subprob': subprob, 'was_deleted': False, "del_var": del_mu} # was_deleted to not duplicate deletions later
-                    new_mu.data = {"subprob": subprob, "is_optimal": False, "old": False}
-                    added_mus.append(new_mu)
-
-                # Adding delta variable
-                if pricing_formulation in [1,2]:
-                    identical = False
-                    key = self._ARMP_get_delta_key_for_hashing(delta_pattern=delta_patterns[i], subprob=subprob)
-                    self.data["delta_encoding_rev"][subprob][key] = given_delta[i]
-                    if key in self.data["delta_encoding"][subprob]:
-                        identical = True
-                        delta_name = self.data["delta_encoding"][subprob][key][0]
-                        new_delta = self.data["Delta"][subprob][delta_name]
-                        given_delta[i] = new_delta.name
-
-                    if not identical:
-                        new_delta = self.model.addVar("delta[%i,%s]*" % (subprob, current_delta_index), vtype=vtype,
-                                                lb = 0, obj=maintenance_cost[i], pricedVar=True, deletable=True)
-                        self.n_delta+=1
-                        new_delta.data = {'subprob': subprob, 'old': False}
-                        if given_delta[i] == None:
-                            given_delta[i] = new_delta.name
-                        added_deltas.append(new_delta)
-
                 # adding the new column to convexity constraint
                 if pricing_formulation == -1: 
                     self.model.addConsCoeff(self.data["convexity_cons"][subprob], newVar, 1)
-
-                # adding new delta to convexity constraints
-                if pricing_formulation in [1,2] and not identical:
-                    self.model.addConsCoeff(self.data["convexity_cons"][subprob], new_delta, 1)
-
-                # adding new mu to compatibility constraints
-                if pricing_formulation == 0:
-                    self.model.addConsCoeff(self.data["compatibility_cons"][subprob][given_delta[i]], new_mu, 1)
-
-                # Adding new row
-                if pricing_formulation in [1,2]:
-                    if pricing_formulation == 2:
-                        given_mu = new_mu
-                        if identical:
-                            self.model.addConsCoeff(self.data["compatibility_cons"][subprob][given_delta[i]], new_mu, 1)
-                        else:
-                            new_compatibility_cons = self.model.addCons(given_mu <= new_delta, modifiable=True, name="A_compatibility_%s" % (new_delta))
-                            self.data["compatibility_cons"][subprob][new_delta.name] = new_compatibility_cons
-                    elif pricing_formulation == 1: # added later
-                        given_mu = converted_mus[i]
 
                 # Adding new column to demand constraints (this will be harder with other formulations)
                 if pricing_formulation == -1:                
                     for t, c in enumerate(self.data["demand_cons"]):
                         self.model.addConsCoeff(c, newVar, round_up(vars[i]["y[0,%i]" % (t+1)], 5))
-
-                elif pricing_formulation in [0,2]:
-                    for t, c in enumerate(self.data["demand_cons"]):
-                        self.model.addConsCoeff(c, new_mu, mu_patterns[i]["y[0,%i]" % (t+1)])
 
                 # Debug: VERY IMPORTANT!!! because variables are added globally, you also need to add them to all branching constraints
                 # Adding new column to branching constraints
@@ -1434,65 +1265,11 @@ class CutPricer(Pricer):
                     for k, v in cur_integer_pattern.items():
                         self.data["mvars_by_integer_variable"][subprob][(k, v)].append(newVar.name)
 
-                if pricing_formulation == 1:
-                    if not identical:
-                        self.data["Delta"][subprob][new_delta.name]              = new_delta
-                        self.data["Delta_patterns"][subprob][new_delta.name]     = delta_patterns[i]
-                        self.data["compatibility_cons"][subprob][new_delta.name] = new_compatibility_cons
-                        self.data["Mu"][subprob][new_delta.name]                 = {}
-                        self.data["Mu_patterns"][subprob][new_delta.name]        = {}
-
-                    # Adding mu to the new delta data and compatibility constraint
-                    mu = converted_mus[i]
-                    # self.data["Mu"][subprob][new_delta.name][mu.name] = mu
-                    # self.data["Mu_patterns"][subprob][new_delta.name][mu.name] = mu_patterns[i]
-
-                    self.remove_column_from_RMP(var=mu, subprob=subprob, old_delta=old_delta[i])
-            
-                    if not identical:
-                        new_compatibility_cons = self.model.addCons(0 >= -new_delta, modifiable=True, name="A_compatibility_%s" % (new_delta.name))
-                        self.data["compatibility_cons"][subprob][new_delta.name] = new_compatibility_cons
-                    
-                    # Adding transfered mu to the problem
-                    added_mus = self.add_column_to_RMP(subprob=subprob, result={"mu_name": mu.name, "given_delta": {0: new_delta.name}, "maintenance_cost": 0, "fixed_redcost_contribution": 0, "objval": [-1], "vars": [], "mu_patterns": [mu_patterns[i]], "delta_patterns": [], "pricing_formulation": 0})
-                    added_mus[0].data["is_optimal"] = True
-
-                if pricing_formulation in [1,2]:
-                    self.data["all_delta_patterns"][new_delta.name] = delta_patterns[i]
-                    key = self._ARMP_get_delta_key_for_hashing(delta_pattern=delta_patterns[i], subprob=subprob)
-
-                    # to make lookup easier when branching
-                    if key not in self.data["delta_encoding"][subprob]:
-                        self.data["delta_encoding"][subprob][key] = [new_delta.name]
-                        self.data["delta_encoding_rev"][subprob][new_delta.name] = key
-
-                # if delta_patterns[i] in self.data["Delta_patterns"][subprob].values():
-                #     pass
-
-                if pricing_formulation == 2 and not identical:
-                    self.data["Delta"][subprob][new_delta.name]              = new_delta
-                    self.data["Delta_patterns"][subprob][new_delta.name]     = delta_patterns[i]
-                    self.data["compatibility_cons"][subprob][new_delta.name] = new_compatibility_cons
-                    self.data["Mu"][subprob][new_delta.name]                 = {}
-                    self.data["Mu_patterns"][subprob][new_delta.name]        = {}
-
-                if pricing_formulation == 2: given_delta[i] = new_delta.name
-
-                if pricing_formulation in [0,2]:
-                    self.data["Mu"][subprob][given_delta[i]][new_mu.name]          = new_mu
-                    self.data["Mu_patterns"][subprob][given_delta[i]][new_mu.name] = mu_patterns[i]
-
         # Had an issue here with using epsilon instead of dualfeastol
         assert have_new_col or "compact_run" in result, "Repeated column with negative redcost"
 
         if pricing_formulation == -1:
             return added_vars
-        elif pricing_formulation == 0:
-            return added_mus
-        elif pricing_formulation == 1:
-            return added_deltas
-        elif pricing_formulation == 2:
-            return list(zip(added_mus, added_deltas))
         else:
             raise ValueError("Invalid formulation")
 
@@ -1576,19 +1353,6 @@ class CutPricer(Pricer):
         #return True
         if pricing_formulation == -1:
             new_col = ''.join(str(vars)) not in self.data["pattern_encoding"][subprob]
-
-        elif pricing_formulation == 0:
-            new_col = ''.join(str(mu_patterns)) not in self.data["mu_encoding"][subprob]
-        elif pricing_formulation == 1:
-            new_col = ''.join(str(delta_patterns)) not in self.data["delta_encoding"][subprob]
-        elif pricing_formulation == 2:
-            new_continuous_col = True
-            new_discrete_col   = True
-            if given_delta in self.data["Mu"][subprob]:
-                new_col = ''.join(str(mu_patterns)) not in self.data["mu_encoding"][subprob]
-            if self.data["Delta"][subprob]:
-                new_col = ''.join(str(delta_patterns)) not in self.data["delta_encoding"][subprob]
-            new_col = new_discrete_col or new_continuous_col
         else:
             raise ValueError("Invalid formulation")
 
@@ -1855,20 +1619,9 @@ class CutPricer(Pricer):
 
             cur_dualSolutions = {"convexity_duals": dualSolutions["convexity_cons"][subprob], "compatibility_duals": dualSolutions["compatibility_cons"][subprob], "demand_duals": dualSolutions["demand_cons"], "branching_duals": dualSolutions["branching_cons"][cur_node_number][subprob]}
             pi    = [cur_dualSolutions["convexity_duals"]] + cur_dualSolutions["demand_duals"]
-            if pricing_formulation == 0:
-                assert given_delta != None
-                eta   = cur_dualSolutions["compatibility_duals"][given_delta]
-            else:
-                eta = "alsdnkajn"
+            eta = "alsdnkajn"
 
-            if pricing_formulation == 1:
-                assert given_mu != None
-                assert old_delta != None
-                given_mu = self.data["Mu"][subprob][old_delta][given_mu]
-                mu_val = self.model.getSolVal(sol=None, expr=given_mu)
-                mu_dual_contribution = self.ARMP_key_for_sorting_mus(mu=given_mu, old_delta=old_delta, mu_val=mu_val, pi=pi, subprob=subprob)
-            else:
-                mu_dual_contribution = None
+            mu_dual_contribution = None
 
             gamma = cur_dualSolutions["branching_duals"]
 
@@ -1920,13 +1673,7 @@ class CutPricer(Pricer):
                                 pricing_formulation=pricing_formulation,
                                 branching_decisions=branching_decisions)
 
-        if pricing_formulation != 0:
-            fixed_redcost_contribution = pi[0] # only convexity constraint in most cases, except PP1, where it's also the dual of the fixed mu
-        else:
-            fixed_redcost_contribution = 0 # mu's don't show up in the convexity constraints
-
-        if pricing_formulation == 1:
-            fixed_redcost_contribution += mu_dual_contribution
+        fixed_redcost_contribution = pi[0] # only convexity constraint in most cases, except PP1, where it's also the dual of the fixed mu
 
         # valid cut
         # need to be careful with these cuts, because t
@@ -1997,22 +1744,14 @@ class CutPricer(Pricer):
         
         if self.data["model"] == 0:
             sols = pricing_model.getSols()
-        elif self.data["model"] == 2:
-            sols = [pricing_model.getBestSol()] # Just trying out keeping the RMP as small as possible with ARMP
 
         if len(sols) == 0:
             if pricing_formulation in [-1,2]:
                 return {"result": SCIP_RESULT.INFEASIBLE, "pricing_formulation": pricing_formulation}
-            elif pricing_formulation in [0,1]:
-                return {"result": SCIP_RESULT.DIDNOTFIND, "pricing_formulation": pricing_formulation}
             else:
                 raise ValueError("Invalid formulation")
 
         threshold = -self.dualfeastol
-        if pricing_formulation == 0: # stricter limit for continuous pricing
-            threshold *= 1000
-        elif pricing_formulation == 1:
-            threshold *= 10
         sols = [s for s in sols if self.model.isLE(pricing_model.getSolObjVal(s) - fixed_redcost_contribution, threshold)]
 
         # if no negative redcost solution found, return
@@ -2116,9 +1855,6 @@ class CutPricer(Pricer):
         # for c in dualSolutions["demand_duals"]:
         #     dualSolutions["demand_duals"][c] = fmean(c[-5:])
 
-        if pricing_formulation == 0:
-            assert given_delta != -1, "PP 0 needs to be given a discrete pattern!" 
-
         # Getting duals of the relevant subprob for current node
         cur_node_number = self.model.getCurrentNode().getNumber()
 
@@ -2149,15 +1885,8 @@ class CutPricer(Pricer):
             self.data["exact_pricing_start_time"] = time()
 
             # we need to be careful about passing the right duals
-            if pricing_formulation == 0:
-                fixed_delta = self.data["Delta_patterns"][subprob][given_delta]
-            else:
-                fixed_delta = {}
-
-            if pricing_formulation == 1:
-                fixed_mu = self.data["Mu_patterns"][subprob][old_delta][given_mu]
-            else:
-                fixed_mu = {}
+            fixed_delta = {}
+            fixed_mu = {}
 
             branching_decisions = self.get_branching_decision(cur_node_number, subprob)
             
@@ -2196,52 +1925,27 @@ class CutPricer(Pricer):
         for i, s in enumerate(sols):
             obj = pricing_model.getSolObjVal(s)
             objval[i] = obj
+            cur_vars = {}
+            cur_maintenance_cost = 0
+            for var in pricing_model.getVars():
+                cur_vars[var.name] = pricing_model.getSolVal(s, var)
+                if "m[" in var.name:
+                    # cur_vars[var.name] = self.model.feasFloor(cur_vars[var.name]) # numerics
+                    cur_maintenance_var = cur_vars[var.name]
+                    if self.model.isGT(cur_maintenance_var, 0):
+                        component_name = var.name.split(",")[1]
+                        component=self.data["params"][subprob].components[component_name]
+                        cur_maintenance_cost += cur_vars[var.name]*component.C
+            maintenance_cost[i] = self.model.feasFloor(cur_maintenance_cost)
 
-            if pricing_formulation > -1:
-                cur_mu = {}
-                cur_delta = {}
-                cur_maintenance_cost = 0
-                for var in pricing_model.getVars():
-                    if "m[" in var.name:
-                        cur_delta[var.name]   = pricing_model.getSolVal(s, var) 
-                        cur_component_name    = var.name.split(",")[1]
-                        cur_component_cost    = self.data["params"][subprob].components[cur_component_name].C
-                        cur_maintenance_cost += cur_delta[var.name]*cur_component_cost
-                    elif "y" in var.name:
-                        cur_mu[var.name] = pricing_model.getSolVal(s, var)
-                    else:
-                        continue
-
-                cur_delta["maintenance_cost"] = cur_maintenance_cost
-                maintenance_cost[i] = cur_delta["maintenance_cost"]
-
-                mu[i] = cur_mu
-                delta[i] = cur_delta
-                # str_cur_delta = str(cur_delta)
-                # if str_cur_delta not in seen_deltas:
-                #     seen_deltas.append(str_cur_delta)
-            else:
-                cur_vars = {}
-                cur_maintenance_cost = 0
-                for var in pricing_model.getVars():
-                    cur_vars[var.name] = pricing_model.getSolVal(s, var)
-                    if "m[" in var.name:
-                        # cur_vars[var.name] = self.model.feasFloor(cur_vars[var.name]) # numerics
-                        cur_maintenance_var = cur_vars[var.name]
-                        if self.model.isGT(cur_maintenance_var, 0):
-                            component_name = var.name.split(",")[1]
-                            component=self.data["params"][subprob].components[component_name]
-                            cur_maintenance_cost += cur_vars[var.name]*component.C
-                maintenance_cost[i] = self.model.feasFloor(cur_maintenance_cost)
-
-                vars[i] = cur_vars
-                vars[i]["total_cost"] = cur_maintenance_cost
-                vars[i]["maintenance_cost"] = cur_maintenance_cost
-                mu[i] = None
-                delta[i] = cur_vars
-                # str_cur_vars = str(cur_vars)
-                # if str_cur_vars not in seen_deltas:
-                #     seen_deltas.append(str_cur_vars)
+            vars[i] = cur_vars
+            vars[i]["total_cost"] = cur_maintenance_cost
+            vars[i]["maintenance_cost"] = cur_maintenance_cost
+            mu[i] = None
+            delta[i] = cur_vars
+            # str_cur_vars = str(cur_vars)
+            # if str_cur_vars not in seen_deltas:
+            #     seen_deltas.append(str_cur_vars)
 
         result = {
             'objval'             : objval,
@@ -2301,12 +2005,6 @@ class CutPricer(Pricer):
     
     def var_in_branching_cons(self, var, branching_decision):
         return var.name in [v.name for v in self.model.getConsVars(branching_decision.branching_con)]
-
-    def patterns_compatible(self, delta_pattern: dict, mu_pattern: dict) -> bool:
-        """
-        Compatible iff no time period has both maintenance and production (bitwise AND == 0).
-        """
-        return (self.ARMP_encode_delta_pattern(delta_pattern) & self.ARMP_encode_mu_pattern(mu_pattern)) == 0
 
     def visualize_tree(self):
         """
@@ -2558,10 +2256,6 @@ def create_pricer(params=params):
     pricer.data["node_depth"]                     = {1: 0} # depth of unexplored nodes, to switch to bfs
     pricer.data["bfs"]                            = 0
     pricer.data["lpsol"]                          = {} # to fix the issue with pseudo solution branching
-
-    # ARMP
-    pricer.data["n_straight_0_pricing_rounds"] = {i: 0 for i in range(n_subprobs)} 
-    pricer.data["n_straight_1_pricing_rounds"] = {i: 0 for i in range(n_subprobs)}
 
     # statistics
     pricer.data["bound"]                   = [-float("inf")]

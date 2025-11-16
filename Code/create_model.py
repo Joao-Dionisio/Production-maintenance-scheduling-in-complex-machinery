@@ -33,7 +33,7 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
             
     # Creating the machines with their components   
     N = []
-    if pricing_formulation >= -1:
+    if pricing_formulation == -1:
         machines_per_group = [1]
         cur_machine = deepcopy(params[subprob])
         cur_machine.id = 0
@@ -56,10 +56,6 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
             machine_map[machine_idx] = (subprob, pos)
             machine_idx += 1
 
-    # todo: think about this!!! later on you might only need partial columns for feasibility, maybe
-    if farkas and pricing_formulation > -1:
-        pricing_formulation = -1 # careful
-
     model = Model()
     model.setParam("limits/time", params["time_limit"])
     model.setParam("nlhdlr/concave/detectsum", True) # from Stefan #3899
@@ -71,27 +67,20 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
     #### Variable Declaration
     y = {}
     for n in N:
-        if pricing_formulation == 1:
+        if not params["discrete_production"]:
             for t in T_prime:
-                # no need adding a constraint saying the continuous variable is equal to 
-                # the value in question, can just say it's a parameter
-                    y[n.id, t] = fixed_mu["y[0,%i]"%t]
-                    continue
+                y[n.id,t] = model.addVar("y[%i,%i]"%(n.id,t), ub=n.Q, lb=0)
+                if pricing_formulation == -2:
+                    if machine_map:
+                        subprob, pos = machine_map[n.id]
+                y[n.id,t].data = {"subprob": subprob}
         else:
-            if not params["discrete_production"]:
-                for t in T_prime:
-                    y[n.id,t] = model.addVar("y[%i,%i]"%(n.id,t), ub=n.Q, lb=0)
-                    if pricing_formulation == -2:
-                        if machine_map:
-                            subprob, pos = machine_map[n.id]
-                    y[n.id,t].data = {"subprob": subprob}
-            else:
-                if params["discrete_production"]:
-                    discrete_y = {}
+            if params["discrete_production"]:
+                discrete_y = {}
 
-                    for t in T_prime:
-                        discrete_y[n.id,t] = model.addVar("discrete_y[%i,%i]"%(n.id,t), vtype="I", ub=n.n_production_levels, lb=0)
-                        y[n.id,t] = n.Q*discrete_y[n.id,t]/n.n_production_levels
+                for t in T_prime:
+                    discrete_y[n.id,t] = model.addVar("discrete_y[%i,%i]"%(n.id,t), vtype="I", ub=n.n_production_levels, lb=0)
+                    y[n.id,t] = n.Q*discrete_y[n.id,t]/n.n_production_levels
 
     r = {}
     for n in N:
@@ -106,11 +95,6 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
                 if k.artificial:
                     m[n.id,k.name,t] = 0
                     continue
-
-                if pricing_formulation == 0:
-                    m[n.id,k.name,t] = fixed_delta["m[%i,%s,%i]"%(n.id,k.name,t)]
-                    continue
-
 
                 if linear_relaxation:
                     m[n.id,k.name,t] = model.addVar("m[%i,%s,%i]"%(n.id,k.name,t),vtype="C",lb=0,ub=k.n_maintenance_actions)
@@ -217,9 +201,6 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
                         
                     branching_thresholds = branching_decision.branching_thresholds
                     auxiliary_var[aggregate_index] = {}
-    
-                    if pricing_formulation == 0:
-                        branching_applicable[aggregate_index] = True
 
                     n_upper_bounds = 0
                     n_lower_bounds = 0
@@ -240,18 +221,6 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
                             cur_var = discrete_y[0, time]
                         else:
                             raise ValueError("Branched on artificial variable")
-
-                        # In continuous formulation, maintenance is fixed, so just need to check if constraints are satisfied
-                        if pricing_formulation == 0:
-                            if threshold_inequality == "<=":
-                                if model.isGT(cur_var, threshold):
-                                    branching_applicable[aggregate_index] = False
-                                    break
-                            elif threshold_inequality == ">=":
-                                if model.isLT(cur_var, threshold):
-                                    branching_applicable[aggregate_index] = False
-                                    break
-                            continue
 
                         # Important: you need the split between the down and up branches, because there will be different incentives from gamma
                         varub = cur_var.getUbOriginal()                  
@@ -297,15 +266,6 @@ def create_model(params, joint_feasibility_check=False, pi=None, gamma=None, eta
             if pricing_formulation == -1:
                 #model.setObjective((1-farkas)*total_maintenance - quicksum(y[0,t]*pi[t] for t in T) - pi[0] - branching_redcost, "minimize")
                 model.setObjective((1-farkas)*total_maintenance - quicksum(y[0,t]*pi[t] for t in T_prime) - branching_redcost, "minimize")
-
-            elif pricing_formulation == 0:
-                model.setObjective(- quicksum(y[0,t]*pi[t] for t in T_prime) - 1*eta, "minimize")
-
-            elif pricing_formulation == 1:
-                model.setObjective(total_maintenance - branching_redcost, "minimize")
-            
-            elif pricing_formulation == 2:
-                model.setObjective((1-farkas)*total_maintenance - 2*quicksum(y[0,t]*pi[t] for t in T_prime) - branching_redcost, "minimize")
 
     #########################
     # Heuristic Constraints #

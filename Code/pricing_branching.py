@@ -52,13 +52,11 @@ def branching_init(self, model):
     self.model = model
     self.pricer = model.data["pricer"]
     if self.pricer.data["model"] == 0:
-        self.ARMP = False
         self.var_names = "var"
         self.patterns = "patterns"
         self.integer_patterns = "integer_patterns"
         self.integer_encoding = "integer_encoding"
     elif self.pricer.data["model"] == 2:
-        self.ARMP = True
         self.var_names = "Delta"
         self.patterns = "Delta_patterns"
         self.integer_patterns = "all_delta_patterns"
@@ -140,7 +138,6 @@ class PricingBranchingAggregateVarbound(Branchrule):
     def __init__(self, model):
         self.model: Model
         self.pricer: Any
-        self.ARMP: bool
         self.var_names: str
         self.patterns: str
         self.integer_patterns: str
@@ -672,10 +669,7 @@ class PricingBranchingAggregateVarbound(Branchrule):
         master_vars = [mvar[0] for mvar in master_vars]
         for index1, mvar_1 in enumerate(master_vars):
             integer_pattern1 = self.pricer.data[self.integer_patterns][mvar_1.name]
-            if self.ARMP:
-                encoding_key1 = self.pricer._ARMP_get_delta_key_for_hashing(delta_pattern=integer_pattern1, subprob=subprob)
-            else:
-                encoding_key1 = str(sorted(list(integer_pattern1.items())))
+            encoding_key1 = str(sorted(list(integer_pattern1.items())))
 
             for mvar_2 in master_vars[index1+1:]:
 
@@ -876,6 +870,7 @@ class PricingBranchingAggregateVarbound(Branchrule):
                 if node.getType() == 4:
                     continue
                 self.model.cutoffNode(node)
+
             return
 
         nodes_to_cut = []
@@ -1047,7 +1042,6 @@ class PricingBranchingDisaggregate(Branchrule):
     def __init__(self, model):
         self.model: Model
         self.pricer: Any
-        self.ARMP: bool
         self.var_names: str
         self.patterns: str
         self.integer_patterns: str
@@ -1262,7 +1256,6 @@ class PricingEventHdlr(Eventhdlr):
 
     def eventinit(self):
         self.model.catchEvent(SCIP_EVENTTYPE.NODEFOCUSED, self)
-        # self.model.catchEvent(16384, self) #DEBUG DEBUG DEBUG EXTREMELY IMPORTANT!!!!
 
     def eventexec(self, event):
         try:
