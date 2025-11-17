@@ -6,17 +6,12 @@ from parameters import *
 from master_problem import master_model
 from create_model import create_model # Pricing is done here as well
 
-# Pricing
-from generate_initial_pricing_columns import PFHeuristic, _eval
-from copy import copy
-
 # Branching
 from pricing_branching import PricingBranchingAggregateVarbound, PricingBranchingDisaggregate, PricingEventHdlr
 from pricing_branching import BranchingDecision
 
 # Misc
 from time import time
-from statistics import fmean # dual stabilization
 from testing import log_error # writting errors to file
 from collections import defaultdict
 import numpy as np
@@ -30,17 +25,8 @@ import os
 MAX_SUBPROB_SIZE_FOR_COMPACT_INITIALIZATION = 20000
 COMPACT_MODEL_TIME_LIMIT     = 30
 COMPACT_MODEL_RUN_FREQUENCY  = 10000
-N_HEURISTIC_TRIES            = 10
-AGE_CUTOFF                   = 20 # for cleaning old columns
 IRMP_COOLDOWN_DEFAULT        = 3 # minimum number of nodes between IRMP solves (as sometimes it solves too often)
 FAILED_IRMP_PENALTY_FACTOR   = 0.3 # ratio of new columns needed before re-atempting Price-and-Branch
-MAX_STRAIGHT_0_SUBPROBS      = 50 # to make use of new deltas for column domination
-MAX_STRAIGHT_1_SUBPROBS      = 10
-
-# Dual stabilization
-INITIAL_ALPHA        = 0.1
-MAX_ALPHA            = 0.7
-ALPHA_RATE_OF_CHANGE = 1.2
 
 # Print iteration info
 COL1_WIDTH  = 15
@@ -83,9 +69,7 @@ class CutPricer(Pricer):
     def __init__(self, n_subprobs):        
         super().__init__()
         self.optimal_cols               = 0
-        self.heuristic_cols             = 0
         self.optimal_time               = 0
-        self.heuristic_time             = 0
         self.prev_node_nvars            = 0
         self.ncols_required_for_imp_opt = 0
         self.n_delta                    = 0
@@ -103,7 +87,6 @@ class CutPricer(Pricer):
         self.break_early:            Dict[int, Any]   = {}
         self.applied_redcost_fixing: Dict[int, Any]   = {}
         self.seen_duals:             list             = []
-        self.alpha:                  float            = INITIAL_ALPHA # dict[int, float] = {i: INITIAL_ALPHA for i in range(n_subprobs)}
         self.irmp_cooldown:          int              = 0
         self.force_negative_redcost: bool             = False
 
@@ -417,7 +400,6 @@ class CutPricer(Pricer):
         - Updating primal bounds and storing best solutions found.
         - Adding columns to the Restricted Master Problem (RMP) based on repaired variables or implicit integer solutions.
         - Collecting dual solutions and applying dual stabilization if required.
-        - Sorting subproblems for heuristic pricing and running heuristic routines.
         - Running the exact pricing loop to find columns with negative reduced cost.
         - Cleaning up inactive columns from the RMP.
         - Handling integer RMP runs and updating lower bounds.
@@ -443,14 +425,9 @@ class CutPricer(Pricer):
         self.data["master_time"] += max(0.0, start - last_end)
         self.data["begin_pricing_time"] = start
 
-        heuristic_time = 0.0
         exact_time = 0.0
         integer_rmp_time = 0.0
         self.data["old_lambdas"] = 0
-        self.data["removed_deltas"] = 0
-        self.data["removed_mus"] = 0
-        self.data["old_deltas"] = 0
-        self.data["old_mus"] = 0
 
         if self.cur_node_number in self.data["closed_nodes"]:
             now = time()
@@ -465,43 +442,7 @@ class CutPricer(Pricer):
         dualSolutions, dualSolsWithNames = self.collect_dual_values()
         self.data["dualSolutions"] = dualSolutions
         self.data["dualSolsWithNames"] = dualSolsWithNames
-
-        if self.data["params"]["dual_stabilization"] and not self.farkas:
-            dualSolutions = self.get_stabilized_duals()
-
-        # sorting subproblems by heuristic result
-        if self.n_subprobs > 1 or self.data["params"]["heuristic"] > 1:
-            if self.data["params"]["heuristic"] == -1 or self.redcost_iteration % 50 == 0:
-                self.ordered_subprobs = [i for i in range(self.n_subprobs)]
-            else:
-                heuristic_start = time()
-                if self.data["model"] == 2:
-                    # result = self.sort_subproblems(dualSolutions=dualSolutions)
-                    result = {} # DEBUG: eval is not working properly, careful!! # self.sort_subproblems(dualSolutions=dualSolutions)
-                else:
-                    result = self.sort_subproblems(dualSolutions=dualSolutions)
-                heuristic_time = time() - heuristic_start
-                self.data["heuristic_time"] += heuristic_time
-
-                if "result" in result and result["result"] == SCIP_RESULT.DIDNOTRUN:
-                    now = time()
-                    self.data["end_pricing_time"] = now
-                    self.data["last_callback_end"] = now
-                    return result
-
-                # found negative redcost or pricing timeout
-                if result and self.data["params"]["heuristic"] == 2:
-                    assert 'result' in result and result['result'] in [SCIP_RESULT.SUCCESS, SCIP_RESULT.DIDNOTRUN]
-
-        if self.data["params"]["heuristic"] == 2 and self.found_negative_redcost:
-            if self.data["params"]["verbose"] >= 2:
-                self.print_iteration_info(result)
-
-            self.data["python_time"] += max(0.0, (time() - start - heuristic_time - exact_time - integer_rmp_time))
-            now = time()
-            self.data["end_pricing_time"] = now
-            self.data["last_callback_end"] = now
-            return {"result": SCIP_RESULT.SUCCESS}
+        self.ordered_subprobs = [i for i in range(self.n_subprobs)] # default ordering
 
         # main (exact) solving loop
         exact_start = time()
@@ -510,14 +451,8 @@ class CutPricer(Pricer):
         self.data["exact_pricing_time"] += exact_time
 
         if self.data["params"]["verbose"] >= 2:
-            if self.data["params"]["model"] == 0:
-                if self.data["old_lambdas"]:
-                    print("Removed %i lambda due to inactivity."%(self.data["old_lambdas"]))
-            elif self.data["params"]["model"] == 2:
-                if self.data["removed_deltas"] or self.data["removed_mus"]:
-                    print("Transfered %i mu variables and removed %i delta due to domination."%(self.data["removed_mus"], self.data["removed_deltas"]))
-                if self.data["old_deltas"] or self.data["old_mus"]:
-                    print("Removed %i delta and %i mu variables due to inactivity."%(self.data["old_deltas"], self.data["old_mus"]))
+            if self.data["old_lambdas"]:
+                print("Removed %i lambda due to inactivity."%(self.data["old_lambdas"]))
 
         integer_rmp_start = time()
         self.ran_integer_rmp = False
@@ -536,7 +471,7 @@ class CutPricer(Pricer):
         if self.data["params"]["verbose"] >= 2:
             self.print_iteration_info(scip_dict)
 
-        self.data["python_time"] += max(0.0, (time() - start - exact_time - heuristic_time - integer_rmp_time))
+        self.data["python_time"] += max(0.0, (time() - start - exact_time - integer_rmp_time))
         now = time()
         self.data["end_pricing_time"] = now
         self.data["last_callback_end"] = now
@@ -620,103 +555,6 @@ class CutPricer(Pricer):
 
         return dualSolutions, dualSolsWithNames
 
-    # Sorting subprobs for exact solve
-    def sort_subproblems(self, dualSolutions):
-        try:
-            return self._sort_subproblems(dualSolutions)
-        except Exception as e:
-            log_error("sort_subproblems", e, self.data["params"]["filename"], self.data["params"]["stop_at_error"])
-            self.data["error"] = True
-            return {"error": str(e)}
-
-    # Sorting subprobs for exact solve
-    def _sort_subproblems(self, dualSolutions) -> dict:
-        """
-        Runs fast heuristics on the subproblems to determine the order in which they should be exactly solved
-
-        Note: If params["heuristics"] > 1 negative recost columns will be added, and pricing will finish 
-        """
-
-        self.ordered_subprobs = []
-
-        # If there are negative reduced cost heuristics, great. Otherwise sort the subproblems by heuristic result and then solve them.
-        heuristic_results = [] 
-        best_heur_result  = float("inf")
-
-        given_delta = None # for initialization purposes
-        if self.data["model"] == 0:
-            pricing_formulation = -1
-        else:
-            raise ValueError("Invalid model number")
-
-        # parallelize this when doing alternative master
-        for subprob in range(self.n_subprobs): 
-
-            # no need to order subproblems if there is only 1
-            if self.data["params"]["heuristic"] == 1 and self.n_subprobs == 1:
-                break
-
-            if pricing_formulation == 2:
-                break
-            
-            if pricing_formulation != 0:
-                fixed_redcost_contribution = dualSolutions["convexity_cons"][subprob]
-            else:
-                fixed_redcost_contribution = 0
-
-            for given_delta in self.data["Delta"][subprob]: 
-                if self.data["model"] == 0: # original
-                    result = self.solve_pricing(subprob, reopt=self.data["params"]["reopt"], heuristic=2, pricing_formulation=-1, dualSolutions=dualSolutions, given_delta=None, given_mu=None)
-                else:
-                    raise ValueError("Invalid model number")
-
-                if self.model.isGT(self.model.getTotalTime(), self.data["params"]["time_limit"]):
-                    return {"result": SCIP_RESULT.DIDNOTRUN}
-                elif 'result' in result:
-                    if result["result"] == SCIP_RESULT.INFEASIBLE: # if one subproblem is infeasible, whole problem is
-                        return result
-                    elif result["result"] == SCIP_RESULT.DIDNOTFIND:
-                        # heuristic_results.append((result["objval"][0], subprob))
-                        best_heur_result = min(best_heur_result, result["objval"][0] - fixed_redcost_contribution)
-                        continue
-
-                objval = result["objval"]
-
-                # if column is good and we want heuristic columns (if not, we still use the result for subproblem sorting)
-                # preventing optimal solve only if heuristic column is good enough
-                if self.data["params"]["heuristic"] > 1 and self.model.isLT(objval[0] - fixed_redcost_contribution, -0.1):
-                    self.found_negative_redcost = True
-
-                    self.add_column_to_RMP(result=result, subprob=subprob, given_delta=given_delta, heuristic=True)
-
-                best_heur_result = min(best_heur_result, objval[0] - fixed_redcost_contribution) # heuristic only gets 1 sol, hence objval[0]
-
-            heuristic_results.append((best_heur_result, subprob)) # because we may want to order subprobs by their objval
-
-        # Getting subproblem order because we might still want to exact solve
-        if heuristic_results:
-            heuristic_results.sort(key=lambda x: x[0] * self.data["params"]["machines_per_group"][x[1]])
-            ordered_subprobs = [heuristic_results[i][1] for i in range(len(heuristic_results))] # heuristic tells us which subprob to go for
-        else:
-            ordered_subprobs = [i for i in range(self.n_subprobs)] # heuristics found zero solutions
-
-        # Getting past redcosts of subproblems to decide order
-        if not heuristic_results and self.redcost_iteration >= 10:
-            ordered_subprobs = sorted([i for i in range(self.n_subprobs)], key = lambda subprob: sum(self.data["previous_redcosts"][subprob][-5:]))
-            if self.data["straight_subprobs"][1] >= 10 and self.data["straight_subprobs"][0] == ordered_subprobs[0]:
-                ordered_subprobs.append(ordered_subprobs.pop(0)) # moving the subprob to the end 
-                self.data["straight_subprobs"] = [ordered_subprobs[0], 0] # resetting the count
-
-        if not ordered_subprobs and not self.found_negative_redcost:
-            self.ordered_subprobs = [i for i in range(self.n_subprobs)]
-        else:
-            self.ordered_subprobs = ordered_subprobs
-
-        if self.found_negative_redcost and self.data["params"]["heuristic"] == 2:
-            return {"result": SCIP_RESULT.SUCCESS, "heuristic": True, "objval": best_heur_result}
-
-        return {}
-
     # ORIG and ARMP exact solving loop
     def exact_solving_loop(self, dualSolutions):
         try:
@@ -763,7 +601,7 @@ class CutPricer(Pricer):
         result = {}
         for subprob in self.ordered_subprobs:
             if self.data["model"] == 0:
-                result = self.solve_pricing(subprob=subprob, reopt=self.data["params"]["reopt"], heuristic=1, dualSolutions=dualSolutions, pricing_formulation=-1, given_delta=None, given_mu=None)
+                result = self.solve_pricing(subprob=subprob, dualSolutions=dualSolutions, pricing_formulation=-1)
             else:
                 raise ValueError("Invalid model number.")
 
@@ -790,7 +628,7 @@ class CutPricer(Pricer):
                     continue
 
             self.found_negative_redcost = True
-            self.add_column_to_RMP(result=result, subprob=subprob, given_delta=given_delta, heuristic=False) 
+            self.add_column_to_RMP(result=result, subprob=subprob, given_delta=given_delta) 
 
             # to avoid exploring the same subproblem too much
             # capping number of straight iterations in this subprob
@@ -816,15 +654,12 @@ class CutPricer(Pricer):
                 - "objval" (float, optional): Reduced cost value.
                 - "result" (float, optional): Alternative reduced cost value if "objval" is not present.
                 - "dualbound" (float, optional): Local dual bound for the current node.
-                - "heuristic" (bool, optional): Indicates if the solution was found by a heuristic.
-                - "pricing_formulation" (str, optional): Identifier for the pricing formulation used.
 
         Prints:
             A formatted table row with the following columns (depending on model type):
                 - Current node number
                 - Number of open nodes
                 - Iteration or formulation|iteration
-                - Reduced cost (with heuristic marker if applicable)
                 - Gap percentage
                 - Primal bound
                 - Global dual bound
@@ -877,10 +712,7 @@ class CutPricer(Pricer):
 
         time = self.model.getSolvingTime()
 
-        if "heuristic" in result and result["heuristic"]:
-            heur = "*"
-        else:
-            heur = ""
+        heur = ""
 
         farkas = "F" if self.farkas else ""
         formulation = str(result.get("pricing_formulation", ""))
@@ -1035,16 +867,16 @@ class CutPricer(Pricer):
             return
 
     # Error safe add_column_to_RMP
-    def add_column_to_RMP(self, result, subprob, given_delta=-1, heuristic=False):
+    def add_column_to_RMP(self, result, subprob, given_delta=-1):
         try:
-            return self._add_column_to_RMP(result=result, subprob=subprob, given_delta=given_delta, heuristic=heuristic)
+            return self._add_column_to_RMP(result=result, subprob=subprob, given_delta=given_delta)
         except Exception as e:
             log_error("add_column_to_RMP", e, self.data["params"]["filename"], self.data["params"]["stop_at_error"])
             self.data["error"] = True
             return {"error": str(e)}
     
     # Checks if current columns can be added to RMP and does it, along with master constraint manipulation
-    def _add_column_to_RMP(self, result, subprob, given_delta=-1, heuristic=False) -> list[Variable]:
+    def _add_column_to_RMP(self, result, subprob, given_delta=-1) -> list[Variable]:
         """
         Adds a new column (variable) to the Restricted Master Problem (RMP) based on the solution of a subproblem.
         This method handles multiple pricing formulations and manages the addition of lambda, mu, and delta variables,
@@ -1060,8 +892,6 @@ class CutPricer(Pricer):
         given_delta : int or dict, optional
             The delta pattern to be used for the new column. Its type and usage depend on the pricing formulation.
             Default is -1.
-        heuristic : bool, optional
-            Indicates whether the column was generated heuristically. Default is False.
         Returns
         -------
         list[Variable]
@@ -1087,24 +917,13 @@ class CutPricer(Pricer):
         assert self.found_negative_redcost == True
 
         added_vars:             list[Variable]       = []
-        added_mus:              list[Variable]       = []
-        added_deltas:           list[Variable]       = []
         newVar:                 Optional[Variable]   = None
-        new_mu:                 Optional[Variable]   = None
-        new_delta:              Optional[Variable]   = None
         identical:              bool                 = False
         currentNumVar:          int                  = -1
-        new_compatibility_cons: Optional[Constraint] = None
-        old_delta:              str                  = ""
-        current_mu_index:       int                  = -1
-        given_mu:               int                  = -1
-        converted_mus:         dict                  = {}
 
         objval                     = result["objval"]
         fixed_redcost_contribution = result["fixed_redcost_contribution"]
         vars                       = result["vars"]
-        mu_patterns                = result["mu_patterns"]
-        delta_patterns             = result["delta_patterns"]
         pricing_formulation        = result["pricing_formulation"]
         maintenance_cost           = result["maintenance_cost"]
 
@@ -1143,11 +962,6 @@ class CutPricer(Pricer):
                     # Increase (or reset) its upper bound as specified
                     self.model.chgVarUb(existing_var, target_ub)
                     continue
-
-                # checking if new column satisfies the constraints of the pricing problem (for heuristic)
-                if self.data["params"]["model"] == 0:
-                    pass#column_feasible = self.check_column_feasibility(subprob=subprob, vars=vars[i])
-                    # assert column_feasible, "Column is infeasible for subproblem %i" % subprob
             else:
                 new_col = True
 
@@ -1155,12 +969,8 @@ class CutPricer(Pricer):
                 have_new_col = True
 
             # we try to always improve the deltas
-            if new_col and (self.model.isLE(objval[i] - fixed_redcost_contribution, -self.dualfeastol) or pricing_formulation == 1):
-
-                if heuristic:
-                    self.heuristic_cols += 1
-                else:
-                    self.optimal_cols += 1
+            if new_col and self.model.isLE(objval[i] - fixed_redcost_contribution, -self.dualfeastol):
+                self.optimal_cols += 1
 
                 if self.data["params"]["linear_relaxation"]:
                     vtype="C"
@@ -1272,70 +1082,6 @@ class CutPricer(Pricer):
             return added_vars
         else:
             raise ValueError("Invalid formulation")
-
-    # Error safe remove_column_from_RMP
-    def remove_column_from_RMP(self, var, subprob, old_delta=""):
-        try:
-            return self._remove_column_from_RMP(var, subprob, old_delta)
-        except Exception as e:
-            log_error("remove_column_from_RMP", e, self.data["params"]["filename"], self.data["params"]["stop_at_error"])
-            self.data["error"] = True
-            return {"error": str(e)}
-
-    # Indirectly removes a column from the RMP, along with master constraint manipulation
-    def _remove_column_from_RMP(self, var, subprob, old_delta):
-        """
-        Removes a variable (column) from the Restricted Master Problem (RMP) and updates associated data structures.
-        Depending on the type of variable (`lambda`, `delta`, or `mu`), this method:
-        - Sets the variable's upper bound to 0 in the model, marking it for deletion.
-        - Removes the variable from relevant dictionaries tracking variables, patterns, encodings, and constraints.
-        - For `delta` variables, also removes associated `mu` variables and updates encoding mappings.
-        - For `mu` variables, removes them from the corresponding `delta` and updates compatibility constraints.
-        - If a `delta` variable has no associated `mu` variables left, recursively removes the `delta` variable.
-        - Optionally prints verbose information about the removal process based on verbosity settings.
-        Args:
-            var: The variable to be removed from the RMP.
-            subprob: The subproblem identifier associated with the variable.
-            old_delta: The previous delta pattern associated with a `mu` variable (used for cleanup).
-        Returns:
-            None
-        """
-        if self.data["params"]["verbose"] >= 2:
-            if var.name.startswith("lambda"):
-                self.data["removed_lambdas"] += 1
-            elif var.name.startswith("delta"):
-                self.data["removed_deltas"] += 1
-            elif var.name.startswith("mu"):
-                self.data["removed_mus"] += 1
-
-            if self.data["params"]["verbose"] >= 4:
-                print(f"Removing {var.name}")
-
-        # adds aux variable that is equal to -var.
-        if var.name.startswith("lambda"):
-            self.model.chgVarUb(var, 0) # setting upper bound to 0, so variable is later deleted
-            del self.data["vars"][subprob][var.name]
-            del self.data["patterns"][subprob][var.name]
-
-        elif var.name.startswith("delta"):
-            self.model.chgVarUb(var, 0) # setting upper bound to 0, so variable is later deleted
-            delta_pattern_encoding = self.data["delta_encoding_rev"][subprob].pop(var.name, None)
-            del self.data["Delta"][subprob][var.name]
-            del self.data["Delta_patterns"][subprob][var.name]
-            del self.data["Mu"][subprob][var.name] # removing all mus associated with this delta
-            del self.data["Mu_patterns"][subprob][var.name]
-            del self.data["delta_encoding"][subprob][delta_pattern_encoding]
-
-        elif var.name.startswith("mu"):
-            self.model.chgVarUb(var, 0) # setting upper bound to 0, so variable is later deleted
-            del self.data["Mu"][subprob][old_delta][var.name]
-            del self.data["Mu_patterns"][subprob][old_delta][var.name]
-
-            # maybe don't remove the delta, since you might regenerate it for other columns. Maybe put it way down in the sorted list of deltas?
-            if not self.data["Mu"][subprob][old_delta]:
-                self.remove_column_from_RMP(var=self.data["Delta"][subprob][old_delta], subprob=subprob, old_delta="")
-
-        return   
 
     def col_is_new(self, vars, pricing_formulation, subprob, mu_patterns, given_delta, delta_patterns):
         try:
@@ -1597,15 +1343,15 @@ class CutPricer(Pricer):
             return self.break_early[self.cur_node_number] # breaking straight away to get updated duals
 
     # Solves pricing problem (-1 to 2) and prepares to add column to RMP
-    def solve_pricing(self, subprob, dualSolutions, reopt, heuristic, pricing_formulation, given_delta, given_mu, old_delta=None):
+    def solve_pricing(self, subprob, dualSolutions, pricing_formulation):
         try:
-            return self._solve_pricing(subprob, dualSolutions, reopt, heuristic, pricing_formulation, given_delta, given_mu, old_delta)
+            return self._solve_pricing(subprob, dualSolutions, pricing_formulation)
         except Exception as e:
             log_error("solve_pricing", e, self.data["params"]["filename"], self.data["params"]["stop_at_error"])
             self.data["error"] = True
             return {"error": str(e)}
 
-    def get_duals_for_pricing(self, pricing_formulation, dualSolutions, subprob, given_delta, old_delta, given_mu):
+    def get_duals_for_pricing(self, pricing_formulation, dualSolutions, subprob):
         cur_node_number = self.model.getCurrentNode().getNumber()
 
         if pricing_formulation == -1:
@@ -1675,18 +1421,7 @@ class CutPricer(Pricer):
 
         fixed_redcost_contribution = pi[0] # only convexity constraint in most cases, except PP1, where it's also the dual of the fixed mu
 
-        # valid cut
-        # need to be careful with these cuts, because t
-        # if pricing_formulation == -1 and self.n_subprobs == 1:
-        #     obj = pricing_model.getObjective()
-        #     pricing_model.addCons(self.data["params"]["machines_per_group"][0] * obj <= self.model.getPrimalbound() - self.model.getLPObjVal())
-
         pricing_model.data = {}
-        pricing_model.data["objLim_stop"] = False
-
-        # TODO: check whether you can now enable setObjlimit
-        if False:
-            pricing_model.setObjlimit(convexity_redcost) # we're subtracting the convexity redcost later
 
         if not optimal:
             pricing_model.setParam("limits/gap", 0.05) # maybe this is too large
@@ -1703,31 +1438,6 @@ class CutPricer(Pricer):
 
             pricing_model.optimize()
 
-            # if objective limit is hit
-            objlimit_hit = False
-            if False and self.model.getStage() == SCIP_STAGE.SOLVED and not self.isInfinity(self.model.getPrimalbound()):
-                objlimit_hit = True
-
-            # might be able to use this in conjunction with setObjlimit() now
-            if False and pricing_model.getNSolsFound() == 0 and not objlimit_hit:
-                return {"result": SCIP_RESULT.INFEASIBLE}
-
-        # should probably just refactor this
-        # misprice. just solving it to optimality
-        if self.data["params"]["dual_stabilization"] and not self.farkas:
-            if pricing_formulation == 0: # todo: while the benefit is dubious for ORMP, for the continuous pricing problem stabilization should be a game changer
-                pass
-
-            if self.model.isLT(pricing_model.getPrimalbound(), -self.dualfeastol):
-                self.misprice[subprob] = max(0, self.misprice[subprob] - 1)
-                self.alpha             = min(MAX_ALPHA, self.alpha * ALPHA_RATE_OF_CHANGE)
-            else:
-                self.misprice[subprob] += 1
-                self.alpha             /= ALPHA_RATE_OF_CHANGE
-                stabilized_duals = self.get_stabilized_duals()
-                pi, gamma, eta, mu_dual_contribution = self.get_duals_for_pricing(pricing_formulation, stabilized_duals, subprob, given_delta, fixed_delta, fixed_mu)
-                self.optimize_pricing_problem(pi, gamma, eta, subprob, fixed_delta, fixed_mu, pricing_formulation, branching_decisions, mu_dual_contribution, given_delta, optimal=True)
-        
         # solving to optimality
         if pricing_model.getStatus() not in ["optimal", "infeasible"] and (optimal or self.model.isInfinity(pricing_model.getPrimalbound()) or self.model.isGE(pricing_model.getPrimalbound() - fixed_redcost_contribution, -self.dualfeastol)):
             pricing_model.setParam("limits/gap", 0.01)
@@ -1776,76 +1486,14 @@ class CutPricer(Pricer):
         
         return result
 
-    def handle_heuristic(self, pricing_formulation, cur_node_number, subprob, pi, gamma, eta, heuristic):
-        heuristic_found_sol = False
-
-        # trying the heuristic first
-        heur1_start_time = time()
-        cur_perturbation = -0.1
-        cur_tries = 0
-
-        result = {"heuristic_found_sol": False}
-        while not heuristic_found_sol and cur_tries < N_HEURISTIC_TRIES: # should be a parameter
-            cur_tries += 1
-            cur_perturbation += 0.01 # this randomizes the duals a little bit
-
-            result = self.solve_pricing_heuristically(
-                cur_perturbation=cur_perturbation,
-                pricing_formulation=pricing_formulation,
-                cur_node_number=cur_node_number,
-                subprob=subprob,
-                pi=pi,
-                gamma=gamma,
-                eta=eta
-            )
-
-            if result["heuristic_found_sol"]:
-                heuristic_found_sol = True
-
-        self.data["discriminated_heur_time"][2] += time() - heur1_start_time
-        return result
-    
-    def solve_pricing_heuristically(self, cur_perturbation, pricing_formulation, cur_node_number, subprob, pi, gamma, eta) -> dict: 
-
-        if pricing_formulation != 0:
-            fixed_redcost_contribution = pi[0]
-
-        result = {"heuristic_found_sol": False}
-        heuristic_model = PFHeuristic(model=self.model, farkas=self.farkas, optimal=False, pricing_formulation=pricing_formulation, optimize_production=True, params=self.data["params"], subprob=subprob, pi=pi, gamma=gamma, eta=eta, cur_perturbation=cur_perturbation)
-        heuristic_result, vars = heuristic_model.get_column_given_production(self.data["branching_decisions"][cur_node_number][subprob], gamma)
-        if self.model.isLT(heuristic_result - fixed_redcost_contribution, -self.dualfeastol - 0.1): # being a bit harsher with the heuristic
-            if self.data["params"]["heuristic"] == 2:
-                self.found_negative_redcost = True
-
-            self.data["heuristics"]["success"] += 1
-
-        result = {
-            "objval": [heuristic_result],
-            "vars": [vars],
-            "mu_patterns": [{}],
-            "delta_patterns": [{}],
-            "heuristic_found_sol": True,
-            "pricing_formulation": pricing_formulation,
-            "fixed_redcost_contribution": pi[0] if pricing_formulation != 0 else 0,
-            "maintenance_cost": [int(vars["total_cost"])] # numerics
-        }
-
-        # We have the option of trying to get the optimal maintenance given a fixed production
-        if False:#heuristic_result > 0:
-            heuristic_result, vars = get_column_given_production(optimal=True,params=self.data["params"],subprob=cur_subprob, pi=cur_dualSolutions)
-
-        self.data["heuristics"]["total"] += 1
-        return result
-
     # Solves pricing problem (-1 to 2) and prepares to add column to RMP
-    def _solve_pricing(self, subprob, dualSolutions, reopt, heuristic, pricing_formulation, given_delta, given_mu, old_delta=None) -> dict:
+    def _solve_pricing(self, subprob, dualSolutions, pricing_formulation) -> dict:
         """
         Solves the various pricing problems of the different formulations
         parameters:
                     :subprob: subproblem number
                     :dualSolutions: values for the dual variables of the current iteration of the RMP
                     :lagrangian_bound: shared variable between subproblem for MP lower bound 
-                    :heuristic: combination of heuristics to be used (1 for exact pricing)
                     :found: boolean indicating whether negative redcost column was found
                     :farkas: boolean indicating whether we are doing farkas" pricing
                     :formulation: which pricing problem should we solve? (-1 for original, 0 for production, 1 for maintenance, 2 for full)  
@@ -1860,51 +1508,31 @@ class CutPricer(Pricer):
 
         pi, gamma, eta, mu_dual_contribution = self.get_duals_for_pricing(pricing_formulation=pricing_formulation,
                                                                           dualSolutions=dualSolutions,
-                                                                          subprob=subprob,
-                                                                          given_delta=given_delta,
-                                                                          old_delta=old_delta,
-                                                                          given_mu=given_mu)
-        heuristic_result = float("inf")
-        heuristic_vars = {}
-        heuristic_found_sol = False
-        if heuristic % 2 == 0:
-            if any(pi):
-                heuristic_result = self.handle_heuristic(pricing_formulation=pricing_formulation,
-                                    cur_node_number=cur_node_number,
-                                    subprob=subprob,
-                                    pi=pi,
-                                    gamma=gamma,
-                                    eta=eta,
-                                    heuristic=heuristic)
-            else:
-                heuristic_result = {"heuristic_found_sol": False, "objval": [float("inf")], "vars": [{}]}
+                                                                          subprob=subprob)
+
+        self.data["exact_pricing_start_time"] = time()
+
+        # we need to be careful about passing the right duals
+        fixed_delta = {}
+        fixed_mu = {}
+
+        branching_decisions = self.get_branching_decision(cur_node_number, subprob)
         
-            return heuristic_result
+        
+        result = self.optimize_pricing_problem(
+            pi=pi, 
+            gamma=gamma,
+            eta=eta,
+            subprob=subprob,
+            given_delta=given_delta,
+            fixed_delta=fixed_delta,
+            fixed_mu=fixed_mu,
+            pricing_formulation=pricing_formulation,
+            branching_decisions=branching_decisions,
+            mu_dual_contribution=mu_dual_contribution
+        )
 
-        if heuristic == 1 or not heuristic_found_sol or self.model.isGE(heuristic_result,0) or ''.join(str(heuristic_vars)) in self.data["pattern_encoding"][subprob]:
-            self.data["exact_pricing_start_time"] = time()
-
-            # we need to be careful about passing the right duals
-            fixed_delta = {}
-            fixed_mu = {}
-
-            branching_decisions = self.get_branching_decision(cur_node_number, subprob)
-            
-            
-            result = self.optimize_pricing_problem(
-                pi=pi, 
-                gamma=gamma,
-                eta=eta,
-                subprob=subprob,
-                given_delta=given_delta,
-                fixed_delta=fixed_delta,
-                fixed_mu=fixed_mu,
-                pricing_formulation=pricing_formulation,
-                branching_decisions=branching_decisions,
-                mu_dual_contribution=mu_dual_contribution
-            )
-
-            return result
+        return result
 
     def get_sols_maintenance_cost(self, sols, pricing_model, pricing_formulation, subprob):
         try:
@@ -2063,7 +1691,6 @@ class CutPricer(Pricer):
             "Exact pricing":        self.data.get("exact_pricing_time", 0.0),
             "Branching":            self.data.get("branching_time", 0.0),
             "Integer RMP":          self.data.get("integer_rmp_time", 0.0),
-            "Heuristics":           self.data.get("heuristic_time", 0.0),
             "Python (overhead)":    self.data.get("python_time", 0.0),
             "Master (reopt)":       self.data.get("master_time", 0.0),
         }
@@ -2261,7 +1888,6 @@ def create_pricer(params=params):
     pricer.data["bound"]                   = [-float("inf")]
     pricer.data["gcd"]                     = gcd 
     pricer.data["redcost"]                 = []
-    pricer.data["heuristics"]              = {"total": 0, "success": 0}
     pricer.data["discriminated_heur_time"] = {2: 0}
     pricer.data["incumbent"]               = [float("inf")]
     pricer.data["setup time"]              = 0
@@ -2299,7 +1925,6 @@ def create_pricer(params=params):
     pricer.data["integer_rmp_time"]        = 0
     pricer.data["exact_time"]              = 0
     pricer.data["python_time"]             = 0
-    pricer.data["heuristic_time"]          = 0
     pricer.data["exact_pricing_time"]      = 0
     pricer.data["branching_start"]         = 0
     # Unified callback anchor to account master time slices between callbacks
@@ -2311,7 +1936,6 @@ def create_pricer(params=params):
     pricer.data["seen_nodes"]              = {}
     pricer.data["infeasibilities"]         = {}
     pricer.data["added_local_constraints"] = {1: True}
-    pricer.data["buggy_heuristic"]         = 0
     pricer.data["objLim_stop"]             = False
     pricer.data["compact_model"]           = { # to resume compact model runs when feasibility is hard
                                                 "model": None,
@@ -2322,8 +1946,6 @@ def create_pricer(params=params):
     if params["model"] == 0:
         for subprob in pricer.data["patterns"]:
             pricer.data["patterns"][subprob][-1] = {} # for initialization purposes in the heuristic
-    elif params["model"] == 2:
-        pass # still need to think what the heuristic will do here
     else:
         raise ValueError("Invalid model")
 
