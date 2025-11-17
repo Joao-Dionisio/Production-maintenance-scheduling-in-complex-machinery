@@ -146,7 +146,6 @@ class PricingBranchingAggregateVarbound(Branchrule):
 
     def branchexeclp(self, allowaddcons=False):
         start_branching_time = time.time()
-        # Attribute master time slice since last callback up to this branching callback
         last_end = self.pricer.data.get("last_callback_end", self.pricer.data.get("master_start_time", start_branching_time))
         self.pricer.data["master_time"] += max(0.0, start_branching_time - last_end)
         result = self._branchexeclp(allowaddcons)
@@ -156,11 +155,6 @@ class PricingBranchingAggregateVarbound(Branchrule):
         # Update unified callback anchor
         self.pricer.data["last_callback_end"] = branching_end
         return result
-
-        # except Exception as e:
-        #     log_error("aggregatevarbound_exec", e, self.pricer.data["params"]["filename"], self.pricer.data["params"]["stop_at_error"])
-        #     self.pricer.data["error"] = True
-        #     return {"error": str(e)}
         
     def _branchexeclp(self, allowaddcons=False) -> dict:
         if not self.pricer.data["lpsol"]:
@@ -867,7 +861,7 @@ class PricingBranchingAggregateVarbound(Branchrule):
         if self.model.isEQ(self.model.getDualbound(), pricer.best_sol["obj"]):
             pricer.data["optimal_sol_is_repaired"] = True
             for node_number, node in pricer.data["nodes"].items():
-                if node.getType() == 4:
+                if node.getType() == 0: # keeping focus node to allow clean exit
                     continue
                 self.model.cutoffNode(node)
 
@@ -968,8 +962,6 @@ class PricingBranchingAggregateVarbound(Branchrule):
 
         for subprob in range(self.pricer.data["params"]["n_groups"]):
             print_branching_info(self.pricer, "repair_step", subprob=subprob, last_subprob=(subprob==self.pricer.n_subprobs-1), n_repaired_variables=len(self.integer_fractionalities[subprob]))
-
-        self.model.cutoffNode(self.model.getCurrentNode()) # just ensuring that the current node is cut off
 
         if self.model.isLE(self.model.getLPObjVal(), self.pricer.primal_bound):
             self.construct_repaired_solution(self.pricer)
